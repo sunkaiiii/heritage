@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>E迹 · 正在打开页面</title></head>
+<body><p>正在打开 E迹 页面…</p><p><a href="/heritage/">返回 E迹 首页</a></p>
+<script>
+(() => {
+    const base = "/heritage/";
+    if (!location.pathname.startsWith(base)) return;
+    const destination = new URL(base, location.origin);
+    destination.searchParams.set("__heritage_route", location.pathname.slice(base.length) + location.search + location.hash);
+    location.replace(destination.href);
+})();
+</script></body></html>

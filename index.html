@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FCF8F5" />
+    <meta name="description" content="E迹 Heritage Online，以文章、名录与传承人的故事，探索仍在生长的非物质文化遗产。" />
+    <base href="/heritage/" />
+    <title>E迹 · Heritage Online</title>
+    <script src="pages-routing.js"></script>
+    <link rel="icon" type="image/svg+xml" href="brand.svg" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="Heritage.Web.Client.styles.css" />
+    <script src="heritage.js"></script>
+    <script src="personal.js"></script>
+    <script src="content-tools.js"></script>
+    <script src="media-viewer.js"></script>
+    <script src="client-startup.js"></script>
+</head>
+<body>
+    <div id="app"><main class="container" style="padding-block:5rem" aria-live="polite"><p>E迹 · HERITAGE ONLINE</p><h1>正在展开文化的故事</h1><p>首次打开需要加载浏览器运行组件，请稍候。</p></main></div>
+    <div id="blazor-error-ui" role="alert">页面连接遇到问题。<a href="/heritage/">重新打开</a></div>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script>Blazor.start().catch(() => { document.getElementById("blazor-error-ui").style.display = "block"; });</script>
+</body>
+</html>
