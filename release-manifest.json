@@ -4,11 +4,11 @@
   "branch": "gh-pages",
   "base_path": "/heritage/",
   "site_url": "https://sunkaiiii.github.io/heritage/",
-  "source_commit": "ab0ef86b650efac1d7b865d54330dda71a39bd32",
+  "source_commit": "b69bf95017ab6339cd191fe2bb4ccd2cf2f4f6f6",
   "source_dirty": false,
-  "created_utc": "2026-10-28T13:55:16.247602+00:00",
+  "created_utc": "2026-10-28T22:31:29.794659+00:00",
   "boot_sri_verified": 54,
-  "artifact_sha256": "01d82f6eab2f89e048e6cfa9b6dd183ab9de67a0235cdbd91884b3df6554a775",
+  "artifact_sha256": "060bd204d286c8f430cd5f3e2e66dfaa6f180ef4a123f2ff088682d31fd21e0a",
   "files": {
     ".nojekyll": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -30,16 +30,16 @@
       "sha256": "84fb200dbcb3df7b8908d6a09085d5edccfb92d1def685aa6866726aa969477c",
       "bytes": 105491
     },
-    "_framework/Heritage.Contracts.d3gp09uezy.wasm": {
-      "sha256": "b941e822b24c35047152bba2fcd6433064ccd14bb181583910b0884f5a635d8d",
+    "_framework/Heritage.Contracts.vdoa9epia8.wasm": {
+      "sha256": "0db50946a339dd6fe4da70e932181159e57d9b85e9b9a046833488d52a5d8fb6",
       "bytes": 364821
     },
-    "_framework/Heritage.Web.Client.f36glwxgt1.wasm": {
-      "sha256": "25b82fdb85cbfae78fa95c9c6aa82a905dec9aeed2fe82c4fc1148e1b0031cca",
+    "_framework/Heritage.Web.Client.epqyyei7cw.wasm": {
+      "sha256": "4e0a9cc7673fc6e7b65fe21f4e2b5a90d94af52ad3586b417343a0957e3e7ac2",
       "bytes": 14613
     },
-    "_framework/Heritage.Web.UI.0ti4o2yw0f.wasm": {
-      "sha256": "cc478c8524caf9cbce542875b056a4e1a18fc8ad91d1cb786406d75de89c3fa5",
+    "_framework/Heritage.Web.UI.y5tclkgn8b.wasm": {
+      "sha256": "5a1c4bfb2c268d25b2f8593036f9a739937bf4f739590a5c047086415893dcb1",
       "bytes": 873749
     },
     "_framework/Microsoft.AspNetCore.Components.Web.j8nqxq17yk.wasm": {
@@ -243,7 +243,7 @@
       "bytes": 60576
     },
     "_framework/dotnet.js": {
-      "sha256": "86f7dde2046a4a523d5cc9a9c3744a28d3979043ca8d4416f14073eecd388127",
+      "sha256": "5980c91e28df060cb92482a4a5c385996276a85b8b0418c2b796ad14ccbdd31a",
       "bytes": 54007
     },
     "_framework/dotnet.native.f749u69f30.wasm": {
