@@ -22,7 +22,9 @@ export function afterWebStarted(blazor) {
             if (action.origin !== window.location.origin) continue;
             const controls = Array.from(form.elements).filter(control =>
                 ["INPUT", "SELECT", "TEXTAREA"].includes(control.tagName)
-                && !["file", "password", "button", "submit", "reset", "image"].includes(control.type));
+                && !["file", "password", "button", "submit", "reset", "image"].includes(control.type)
+                // A value generated for the next submission (for example a new random draw) must not be replaced by the current query.
+                && !control.hasAttribute?.("data-fresh-value"));
             const stamp = JSON.stringify([filterLocation(), action.href, controls.map(control =>
                 control.tagName === "SELECT"
                     ? [control.name, control.multiple, Array.from(control.options, option => [option.value, option.defaultSelected])]

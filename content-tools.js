@@ -35,18 +35,72 @@
             const type = [...textTypes, "application/pdf", "application/zip", "application/octet-stream", "image/png", "image/jpeg", "image/webp"].includes(mediaType) ? mediaType : "application/octet-stream";
             download(name, type, bytes);
         },
+        // Export options live in the address so returning from a preview item restores them.
+        setExportUrl(value) {
+            if (typeof value !== "string" || value.length > 4096 || !value.startsWith("/export") || /[\u0000-\u001f\u007f\\#]/.test(value)) throw new Error("Invalid export address");
+            const base = new URL(document.baseURI || "/", location.origin);
+            const target = new URL(value.slice(1), base);
+            const relative = target.pathname.startsWith(base.pathname) ? target.pathname.slice(base.pathname.length) : null;
+            const current = location.pathname.startsWith(base.pathname) ? location.pathname.slice(base.pathname.length) : null;
+            const exportPath = /^export(?:\/(?:article|directoryItem|inheritor)\/[^/]+)?$/;
+            if (target.origin !== location.origin || !exportPath.test(relative || "") || !exportPath.test(current || "")) throw new Error("Invalid export address");
+            history.replaceState(history.state, "", target.pathname + target.search);
+        },
         async copyText(text) {
             if (typeof text !== "string" || new TextEncoder().encode(text).length > maximum) throw new Error("Clipboard content exceeds limit");
             await navigator.clipboard.writeText(text);
         }
     };
+    // Horizontal pickers keep the selected item in view after navigation or a return visit.
+    // Only the strip itself scrolls, so the page position is left alone.
+    const revealed = new WeakMap();
+    function revealSelected() {
+        for (const strip of document.querySelectorAll("[data-scroll-selected]")) {
+            const selected = strip.querySelector(".selected");
+            if (!selected || revealed.get(strip) === selected) continue;
+            revealed.set(strip, selected);
+            const left = selected.offsetLeft - strip.offsetLeft - (strip.clientWidth - selected.offsetWidth) / 2;
+            strip.scrollLeft = Math.max(0, left);
+        }
+    }
+    if (typeof MutationObserver === "function" && document.documentElement) {
+        let queued = false;
+        new MutationObserver(() => { if (!queued) { queued = true; setTimeout(() => { queued = false; revealSelected(); }, 0); } })
+            .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+    }
+    // Same-page section links move keyboard focus with the view, so the next Tab continues
+    // inside the chosen section instead of jumping back to the table of contents.
+    document.addEventListener("click", event => {
+        const link = event.target.closest?.("a[href*='#']");
+        if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        let url;
+        try { url = new URL(link.href, location.href); } catch { return; }
+        if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search || url.hash.length < 2) return;
+        const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+        if (!target) return;
+        setTimeout(() => {
+            if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+            target.focus({ preventScroll: true });
+        }, 0);
+    });
+    // Native reset restores HTML default values, but Blazor writes input values as properties.
+    // Put the applied conditions back so “cancel changes” matches the results on screen.
+    document.addEventListener("reset", event => {
+        const form = event.target;
+        if (!form?.querySelectorAll) return;
+        setTimeout(() => { for (const input of form.querySelectorAll("input[data-applied]")) input.value = input.getAttribute("data-applied") || ""; }, 0);
+    });
     document.addEventListener("click", async event => {
-        const button = event.target.closest?.("[data-copy-link]");
+        const button = event.target.closest?.("[data-copy-link],[data-copy-text]");
         if (!button) return;
         const feedback = button.nextElementSibling?.hasAttribute("data-copy-feedback") ? button.nextElementSibling : null;
         if (feedback) feedback.textContent = "";
         try {
-            await navigator.clipboard.writeText(location.href); button.dataset.copied = "true";
+            // data-copy-text names an element on the page whose visible text is copied, e.g. a citation.
+            const named = button.dataset.copyText;
+            const text = named === undefined ? location.href : document.getElementById(named)?.textContent?.trim();
+            if (!text) throw new Error("Nothing to copy");
+            await navigator.clipboard.writeText(text); button.dataset.copied = "true";
             if (feedback) feedback.textContent = button.dataset.copySuccess || "Link copied.";
         }
         catch {

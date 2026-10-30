@@ -28,14 +28,52 @@
         element.querySelector("[data-media-notice-text]").textContent = dialog.dataset[key] || "";
         element.hidden = false;
     }
+    // Below this natural width a source image is kept near its real size instead of being stretched.
+    const smallWidth = 360;
+    function message(key, ...values) {
+        return values.reduce((text, value, i) => text.replace(`{${i}}`, String(value)), viewer()?.dataset[key] || "");
+    }
+    function fallbacks(anchor) {
+        return (anchor?.getAttribute("data-preview-fallback") || "").split(/\s+/).map(value => value && safeUrl(value)).filter(Boolean);
+    }
     function collect() {
         const seen = new Set();
         return [...document.querySelectorAll("a[data-preview-image]")].map(anchor => ({
             url: safeUrl(anchor.getAttribute("href")),
+            fallbacks: fallbacks(anchor),
             caption: anchor.querySelector("img")?.alt || anchor.getAttribute("aria-label") || "",
             anchor
         })).filter(item => item.url && !seen.has(item.url) && seen.add(item.url));
     }
+    // Page images: try the asset's other recorded addresses, then say plainly that the image is
+    // missing. Notes are attributes rendered by CSS so the Blazor-owned DOM keeps its children.
+    function inspect(image) {
+        const anchor = image.closest?.("a[data-preview-image]"), figure = anchor?.closest("figure");
+        if (!anchor || !figure || !image.complete) return;
+        if (!image.naturalWidth) {
+            const tried = Number(image.dataset.fallbackIndex || 0), next = fallbacks(anchor)[tried];
+            if (next && next !== image.currentSrc) { image.dataset.fallbackIndex = String(tried + 1); image.src = next; return; }
+            figure.setAttribute("data-media-missing", message("missing"));
+            figure.removeAttribute("data-media-small");
+            return;
+        }
+        figure.removeAttribute("data-media-missing");
+        image.style.setProperty("--media-natural-width", `${image.naturalWidth}px`);
+        if (image.naturalWidth < smallWidth) {
+            figure.setAttribute("data-media-small", message("small", image.naturalWidth, image.naturalHeight));
+            upgrade(image, fallbacks(anchor).filter(url => url !== image.currentSrc), url => { if (image.isConnected) image.src = url; });
+        } else figure.removeAttribute("data-media-small");
+    }
+    // A compressed copy can be much smaller than the recorded original; use the original only
+    // when it actually loads with more pixels.
+    function upgrade(image, candidates, apply) {
+        if (image.dataset.upgradeChecked || !candidates.length) return;
+        image.dataset.upgradeChecked = "true";
+        const probe = new Image();
+        probe.onload = () => { if (probe.naturalWidth > image.naturalWidth) apply(probe.src); };
+        probe.src = candidates[0];
+    }
+    function inspectAll() { for (const image of document.querySelectorAll("a[data-preview-image] img")) if (image.complete) inspect(image); }
     function lockScroll() {
         if (scrollStyle === null) scrollStyle = document.body.style.overflow;
         document.body.style.overflow = "hidden";
@@ -95,9 +133,12 @@
         dialog.dataset.mediaState = "loading"; loading.hidden = false; error.hidden = true; range.disabled = true; range.value = "1";
         dialog.querySelector("[data-media-frame]").setAttribute("aria-busy", "true");
         dialog.querySelector("[data-media-source]").href = item.url;
+        const quality = dialog.querySelector("[data-media-quality]"); if (quality) quality.hidden = true;
+        const sources = [item.url, ...(item.fallbacks || [])]; let attempt = 0;
         const current = () => generation === loadGeneration && catalogPage === pageKey() && dialog === viewer();
         function failed() {
             if (!current()) return;
+            if (++attempt < sources.length) { image.src = sources[attempt]; return; }
             dialog.dataset.mediaState = "error"; loading.hidden = true; error.hidden = false; image.hidden = true; range.disabled = true;
             dialog.querySelector("[data-media-frame]").setAttribute("aria-busy", "false");
         }
@@ -105,10 +146,15 @@
             if (!current()) return;
             if (!image.naturalWidth) { failed(); return; }
             dialog.dataset.mediaState = "loaded"; loading.hidden = true; error.hidden = true; image.hidden = false; range.disabled = false;
+            dialog.querySelector("[data-media-source]").href = image.currentSrc || sources[attempt];
+            if (quality && image.naturalWidth < smallWidth) {
+                quality.textContent = message("smallViewer", image.naturalWidth, image.naturalHeight); quality.hidden = false;
+                upgrade(image, sources.slice(attempt + 1), url => { if (current()) image.src = url; });
+            } else if (quality) quality.hidden = true;
             dialog.querySelector("[data-media-frame]").setAttribute("aria-busy", "false");
         }
         image.addEventListener("load", loaded); image.addEventListener("error", failed);
-        previous.replaceWith(image); image.src = item.url;
+        previous.replaceWith(image); image.src = sources[0];
         if (image.complete) Promise.resolve().then(() => { if (image.naturalWidth) loaded(); else failed(); });
     }
     function show(number, { updateUrl = true } = {}) {
@@ -206,9 +252,15 @@
         event.preventDefault(); navigating = false; gallery = items; catalogPage = pageKey(); trigger = anchor;
         open(selected);
     });
+    document.addEventListener("load", event => { if (event.target?.tagName === "IMG") inspect(event.target); }, true);
+    document.addEventListener("error", event => { if (event.target?.tagName === "IMG") inspect(event.target); }, true);
     window.addEventListener("popstate", restoreFromUrl);
     window.addEventListener("pageshow", () => window.heritageMedia.restore());
-    if (typeof MutationObserver === "function") new MutationObserver(scheduleRestore).observe(document.documentElement, { childList: true, subtree: true });
+    let inspecting = false;
+    if (typeof MutationObserver === "function") new MutationObserver(() => {
+        scheduleRestore();
+        if (!inspecting) { inspecting = true; Promise.resolve().then(() => { inspecting = false; inspectAll(); }); }
+    }).observe(document.documentElement, { childList: true, subtree: true });
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => window.heritageMedia.restore(), { once: true });
     else window.heritageMedia.restore();
 })();

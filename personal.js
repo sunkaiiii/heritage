@@ -88,7 +88,11 @@
         if (!raw || raw.length > 3000000) return empty();
         let parsed;
         try { parsed = JSON.parse(raw); } catch { return empty(); }
-        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return empty();
+        return parse(parsed) || empty();
+    }
+    // Shared by stored state and backup files: every record passes the same validation.
+    function parse(parsed) {
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
         const state = empty();
         state.profileId = validProfile(parsed.profileId) ? parsed.profileId : null;
         state.languageMode = languages.includes(parsed.languageMode) ? parsed.languageMode : "system";
@@ -113,6 +117,31 @@
         state.lastSyncAt = typeof parsed.lastSyncAt === "string" && parsed.lastSyncAt.length <= 64 && !isNaN(Date.parse(parsed.lastSyncAt)) ? iso(parsed.lastSyncAt) : null;
         state.lastSyncError = text(parsed.lastSyncError, 300) || null;
         return state;
+    }
+    // A backup restore only adds to this browser: nothing local is removed, a newer local record wins,
+    // and identity, sync state and old pending operations are not taken from the file.
+    function backupPlan(value) {
+        if (typeof value !== "string" || value.length > 4000000) throw new Error("Invalid backup");
+        let parsed;
+        try { parsed = JSON.parse(value); } catch { throw new Error("Invalid backup"); }
+        const personal = parsed && parsed.version === 1 && Array.isArray(parsed.favorites) ? parse(parsed.personal) : null;
+        if (!personal) throw new Error("Invalid backup");
+        const state = read(), saved = window.heritageStore.getSaved(), keyOf = x => `${x.type}:${x.id}`;
+        const savedKeys = new Set(saved.map(keyOf)), favoriteKeys = new Set();
+        const valid = parsed.favorites.slice(0, 400).map(x => { const item = content(x); return item ? { ...item, savedAt: iso(x.savedAt) } : null; }).filter(Boolean);
+        const favorites = valid.filter(x => !savedKeys.has(keyOf(x)) && !favoriteKeys.has(keyOf(x)) && favoriteKeys.add(keyOf(x)));
+        const room = Math.max(0, 200 - saved.length), addedFavorites = favorites.slice(0, room);
+        const localHistory = new Map(state.history.map(x => [keyOf(x), x]));
+        const history = personal.history.filter(x => !localHistory.has(keyOf(x)) || x.viewedAt > localHistory.get(keyOf(x)).viewedAt);
+        const localProgress = new Map(state.progress.map(x => [x.routeId, x]));
+        const progressItems = personal.progress.filter(x => !localProgress.has(x.routeId) || x.updatedAt > localProgress.get(x.routeId).updatedAt);
+        return { state, saved, addedFavorites, history, progressItems, localHistory, localProgress,
+            preview: { exportedAt: typeof parsed.exportedAt === "string" && !isNaN(Date.parse(parsed.exportedAt)) ? iso(parsed.exportedAt) : null,
+                favoritesAdded: addedFavorites.length, favoritesExisting: valid.length - favorites.length, favoritesInvalid: parsed.favorites.length - valid.length, favoritesOverLimit: favorites.length - addedFavorites.length,
+                historyAdded: history.filter(x => !localHistory.has(keyOf(x))).length, historyUpdated: history.filter(x => localHistory.has(keyOf(x))).length,
+                historyKeptLocal: personal.history.length - history.length,
+                progressAdded: progressItems.filter(x => !localProgress.has(x.routeId)).length, progressUpdated: progressItems.filter(x => localProgress.has(x.routeId)).length,
+                progressKeptLocal: personal.progress.length - progressItems.length } };
     }
     function write(state) { localStorage.setItem(key, JSON.stringify(state)); }
     function operationId() { return crypto.randomUUID().replaceAll("-", ""); }
@@ -184,7 +213,7 @@
             if(typeof type!=="string"||!Object.hasOwn(prefixes,type)||typeof id!=="string"||!/^[a-f\d]{24}$/i.test(id)||appLocation(window.location.href)?.pathname!==`/${prefixes[type]}/${id}`)return false;
             const saved=window.heritagePersonal.getReadingPosition(type,id),fraction=position(saved);
             if(fraction===null)return false;
-            window.scrollTo({top:Math.round(scrollRange()*fraction),behavior:"auto"});return true;
+            window.scrollTo({top:Math.round(scrollRange()*fraction),behavior:"instant"});return true;
         },
         focusReadingPath(){const section=document.getElementById("reading-path");if(section){section.scrollIntoView({block:"start",behavior:"auto"});section.focus({preventScroll:true});}},
         setBuildUrl(value){const target=appPath(value,true),current=appLocation(window.location.href);if(current?.pathname!=="/learning-routes/build"||target?.pathname!=="/learning-routes/build"||target.url.hash)throw new Error("Invalid learning build address");const base=new URL(document.baseURI||"/",window.location.origin);window.history.replaceState(window.history.state,"",base.pathname+target.pathname.slice(1)+target.url.search);},
@@ -225,6 +254,20 @@
             localStorage.setItem(savedKey, JSON.stringify(checked));
         },
         clearLocalData() { return favoriteTransaction(() => { const languageMode = read().languageMode; const state = empty(); state.languageMode = languageMode; localStorage.removeItem(savedKey); write(state); return summary(state); }); },
+        previewBackup(value) { return backupPlan(value).preview; },
+        restoreBackup(value) {
+            return favoriteTransaction(() => {
+                const plan = backupPlan(value), state = plan.state, keyOf = x => `${x.type}:${x.id}`;
+                for (const item of plan.addedFavorites) enqueue(state, { kind: "favorite-upsert", targetType: item.type, targetId: item.id });
+                for (const item of plan.progressItems) enqueue(state, { kind: "progress-upsert", ...item });
+                const history = [...plan.history.map(x => ({ ...x, viewCount: Math.max(x.viewCount, plan.localHistory.get(keyOf(x))?.viewCount || 1) })), ...state.history.filter(x => !plan.history.some(y => keyOf(y) === keyOf(x)))];
+                state.history = history.sort((a, b) => b.viewedAt.localeCompare(a.viewedAt)).slice(0, 200);
+                state.progress = [...plan.progressItems, ...state.progress.filter(x => !plan.progressItems.some(y => y.routeId === x.routeId))].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 100);
+                localStorage.setItem(savedKey, JSON.stringify([...plan.saved, ...plan.addedFavorites].sort((a, b) => b.savedAt.localeCompare(a.savedAt)).slice(0, 200)));
+                write(state);
+                return { ...summary(state), restore: plan.preview };
+            });
+        },
         downloadBackup() {
             const state = read();
             const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), personal: state, favorites: window.heritageStore.getSaved() }, null, 2)], { type: "application/json;charset=utf-8" });
