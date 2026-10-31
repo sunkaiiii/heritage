@@ -55,6 +55,15 @@
             if (target.origin !== location.origin || target.pathname !== base.pathname + "explore/regions" || current !== "explore/regions") throw new Error("Invalid map address");
             history.replaceState(history.state, "", target.pathname + target.search);
         },
+        // 项目家族对照视图的 view 与 ids 写进地址；只允许当前家族页，替换当前记录。
+        setFamilyUrl(value) {
+            if (typeof value !== "string" || value.length > 1024 || !value.startsWith("/directory/families/") || /[\u0000-\u001f\u007f\\#]/.test(value)) throw new Error("Invalid family address");
+            const base = new URL(document.baseURI || "/", location.origin);
+            const target = new URL(value.slice(1), base);
+            const relative = target.pathname.startsWith(base.pathname) ? target.pathname.slice(base.pathname.length) : null;
+            if (target.origin !== location.origin || !/^directory\/families\/[^/]+$/.test(relative || "") || target.pathname !== location.pathname) throw new Error("Invalid family address");
+            history.replaceState(history.state, "", target.pathname + target.search);
+        },
         async copyText(text) {
             if (typeof text !== "string" || new TextEncoder().encode(text).length > maximum) throw new Error("Clipboard content exceeds limit");
             await navigator.clipboard.writeText(text);

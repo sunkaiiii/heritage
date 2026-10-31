@@ -11,7 +11,7 @@
     const validRoute = value => typeof value === "string" && value.length > 0 && value.length <= 640 && !/[\u0000-\u001f\u007f/\\?#]/.test(value) && ![".", ".."].includes(value);
     const validStep = value => typeof value === "string" && value.length > 0 && value.length <= 200 && !/[\u0000-\u001f\u007f,]/.test(value);
     const sourceKinds = ["content", "graph", "search", "learning", "personal", "discovery", "unknown"];
-    const appPaths = /^(?:\/(?:articles|directory|inheritors)\/[a-f\d]{24}|\/directory\/families(?:\/[^/?#]+)?|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
+    const appPaths = /^(?:\/(?:articles|directory|inheritors)\/[a-f\d]{24}|\/directory\/families(?:\/[^/?#]+)?|\/directory\/glossary|\/batches(?:\/\d{4})?|\/inheritors\/generations|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present|\/worksheet)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
     let navigationSource = null, referrerAllowed = true;
     // Persist canonical paths so root-hosted bookmarks and reading paths survive a move to a subdirectory.
     // Navigation evidence, in contrast, must actually belong to the current base URI.
@@ -35,7 +35,7 @@
         const { url, pathname } = target;
         try {
             const query = new URLSearchParams();
-            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province"]) {
+            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province", "ids", "family", "batches", "sort", "letter"]) {
                 const value = url.searchParams.get(key);
                 if (value && value.length <= 300 && !/[\u0000-\u001f\u007f]/.test(value)) query.set(key, value);
             }

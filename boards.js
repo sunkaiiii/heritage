@@ -4,7 +4,7 @@
     "use strict";
     const key = "heritage.web.boards.v1";
     const pendingKey = "heritage.web.sharedBoard";
-    const limits = { boards: 30, items: 1500, perBoard: 100, title: 40, description: 200, note: 200, link: 2000, inflated: 256 * 1024 };
+    const limits = { boards: 30, items: 1500, perBoard: 100, title: 40, description: 200, note: 200, prompt: 200, worksheetText: 40, link: 2000, inflated: 256 * 1024 };
     const prefix = { article: "articles", directoryItem: "directory", inheritor: "inheritors" };
     const letters = { article: "a", directoryItem: "d", inheritor: "p" };
     const types = { a: "article", d: "directoryItem", p: "inheritor" };
@@ -18,7 +18,26 @@
         if (!value || !Object.hasOwn(prefix, value.type) || !validId(value.id)) return null;
         const title = clean(value.title, 300);
         if (!title) return null;
-        return { type: value.type, id: value.id.toLowerCase(), title, meta: clean(value.meta, 300) || null, note: clean(value.note, limits.note), addedAt: iso(value.addedAt) || new Date().toISOString() };
+        // prompt（研学单思考题，docs/features/12）：null 表示跟随备注，字符串（含空串＝留白）表示老师填写
+        return { type: value.type, id: value.id.toLowerCase(), title, meta: clean(value.meta, 300) || null, note: clean(value.note, limits.note),
+            prompt: typeof value.prompt === "string" ? clean(value.prompt, limits.prompt) : null, addedAt: iso(value.addedAt) || new Date().toISOString() };
+    }
+    // 研学单设置：不合格的字段回落默认；date 为 null 表示打印当天，空串表示不印日期；seed 为 null 时由页面按 boardId 推出，不写回
+    function validDate(value) {
+        if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        const [y, m, d] = value.split("-").map(Number), date = new Date(Date.UTC(y, m - 1, d));
+        return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+    }
+    function cleanWorksheet(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+        return {
+            title: clean(value.title, limits.worksheetText), group: clean(value.group, limits.worksheetText),
+            date: value.date === "" ? "" : validDate(value.date) ? value.date : null,
+            count: [0, 5, 10].includes(value.count) ? value.count : 5,
+            seed: Number.isInteger(value.seed) && value.seed >= 1 && value.seed <= 2147483646 ? value.seed : null,
+            lunar: value.lunar === true, answers: value.answers !== false, qr: value.qr === true,
+            size: value.size === "large" ? "large" : "standard"
+        };
     }
     function cleanBoard(value) {
         if (!value || !validBoardId(value.boardId)) return null;
@@ -28,7 +47,7 @@
         const items = (Array.isArray(value.items) ? value.items : []).map(cleanItem).filter(x => x && !seen.has(x.type + x.id) && seen.add(x.type + x.id)).slice(0, limits.perBoard);
         const origin = value.origin && value.origin.fromShare === true ? { fromShare: true, importedAt: iso(value.origin.importedAt) || new Date().toISOString() } : null;
         return { boardId: value.boardId, title, description: clean(value.description, limits.description), createdAt: iso(value.createdAt) || new Date().toISOString(),
-            updatedAt: iso(value.updatedAt) || new Date().toISOString(), origin, items };
+            updatedAt: iso(value.updatedAt) || new Date().toISOString(), origin, items, worksheet: cleanWorksheet(value.worksheet) };
     }
     function read() {
         try {
@@ -49,7 +68,8 @@
     function update(boardId, change) {
         const boards = read(), board = boards.find(x => x.boardId === boardId);
         if (!board) fail("missing_board");
-        change(board);
+        // change 返回 false 表示没有变化：不写入、不刷新 updatedAt（导入合并按 updatedAt 取较新者）
+        if (change(board) === false) return board;
         board.updatedAt = new Date().toISOString();
         write(boards);
         return board;
@@ -133,7 +153,7 @@
         rename(boardId, title, description) { const name = clean(title, limits.title); if (!name) fail("title_required"); return update(boardId, board => { board.title = name; board.description = clean(description, limits.description); }); },
         remove(boardId) { write(read().filter(x => x.boardId !== boardId)); return true; },
         addItem(boardId, item) {
-            const entry = cleanItem({ ...item, note: "", addedAt: new Date().toISOString() });
+            const entry = cleanItem({ ...item, note: "", prompt: null, addedAt: new Date().toISOString() });
             if (!entry) fail("item_invalid");
             return update(boardId, board => {
                 if (board.items.some(x => x.type === entry.type && x.id === entry.id)) return;
@@ -149,6 +169,23 @@
                 const [moved] = board.items.splice(from, 1); board.items.splice(to, 0, moved);
             });
         },
+        // 研学单（docs/features/12）：思考题与设置只在读者修改时写入，打开研学单不写本机
+        setPrompt(boardId, type, id, prompt) {
+            return update(boardId, board => {
+                const item = board.items.find(x => x.type === type && x.id === id);
+                const value = typeof prompt === "string" ? clean(prompt, limits.prompt) : null;
+                if (!item || item.prompt === value) return false;
+                item.prompt = value;
+            });
+        },
+        setWorksheet(boardId, patch) {
+            return update(boardId, board => {
+                const next = cleanWorksheet({ ...(board.worksheet || cleanWorksheet({})), ...(patch && typeof patch === "object" ? patch : {}) });
+                if (JSON.stringify(next) === JSON.stringify(board.worksheet || cleanWorksheet({}))) return false;
+                board.worksheet = next;
+            });
+        },
+        today() { const now = new Date(); return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-"); },
         setNote(boardId, type, id, note) { return update(boardId, board => { const item = board.items.find(x => x.type === type && x.id === id); if (item) item.note = clean(note, limits.note); }); },
         boardsContaining(type, id) { return read().filter(board => board.items.some(x => x.type === type && x.id === id)).map(board => board.boardId); },
         async shareLink(boardId, includeNotes) {
@@ -166,7 +203,9 @@
         decode,
         saveShared(shared) {
             const boards = read();
-            const board = cleanBoard({ boardId: newId(), title: shared?.title, description: shared?.description, origin: { fromShare: true }, items: (shared?.items || []).map(x => ({ ...x, title: x.title || x.id })) });
+            // 只取四个字段：分享链接不带思考题与研学单设置
+            const board = cleanBoard({ boardId: newId(), title: shared?.title, description: shared?.description, origin: { fromShare: true },
+                items: (shared?.items || []).map(x => ({ type: x?.type, id: x?.id, note: x?.note, title: x?.title || x?.id })) });
             if (!board) fail("share_invalid");
             boards.unshift(board); write(boards); return board;
         },

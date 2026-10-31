@@ -15,6 +15,44 @@
         document.documentElement.dataset.theme = value;
         document.documentElement.style.colorScheme = value;
     }
+    // 阅读偏好（docs/features/16）：与主题一样只存在本机，不进备份，「清理本机资料」不清除。
+    // 只设置 <html> 的 data-reading-* 属性，由样式覆盖阅读区域，不修改根字号。
+    const readingKey = "heritage.web.reading.v1";
+    const readingChoices = { size: ["standard", "large", "xlarge"], spacing: ["standard", "loose"], rate: [0.8, 1, 1.2] };
+    const readingDefaults = { size: "standard", spacing: "standard", contrast: false, rate: 1, follow: true };
+    function cleanReading(value) {
+        const source = value && typeof value === "object" ? value : {};
+        return {
+            size: readingChoices.size.includes(source.size) ? source.size : readingDefaults.size,
+            spacing: readingChoices.spacing.includes(source.spacing) ? source.spacing : readingDefaults.spacing,
+            contrast: source.contrast === true,
+            rate: readingChoices.rate.includes(source.rate) ? source.rate : readingDefaults.rate,
+            follow: source.follow !== false
+        };
+    }
+    function getReadingStatus() {
+        let raw;
+        try { raw = localStorage.getItem(readingKey); }
+        catch { return { ...readingDefaults, readable: false }; }
+        // 损坏的值按默认读取，不算存储不可用
+        try { return { ...cleanReading(raw && raw.length <= 1000 ? JSON.parse(raw) : null), readable: true }; }
+        catch { return { ...readingDefaults, readable: true }; }
+    }
+    function applyReading(value) {
+        const root = document.documentElement.dataset;
+        if (value.size === "standard") delete root.readingSize; else root.readingSize = value.size;
+        if (value.spacing === "standard") delete root.readingSpacing; else root.readingSpacing = value.spacing;
+        if (value.contrast) root.readingContrast = "high"; else delete root.readingContrast;
+    }
+    window.heritageReading = {
+        get: getReadingStatus,
+        set(value) {
+            const clean = cleanReading(value);
+            localStorage.setItem(readingKey, JSON.stringify(clean));
+            applyReading(clean);
+            return clean;
+        }
+    };
     function validItem(item) {
         if (!item || typeof item.type !== "string" || !Object.hasOwn(prefix, item.type) || typeof item.id !== "string" || !/^[a-f\d]{24}$/i.test(item.id) || typeof item.title !== "string") return false;
         // Storage stays canonical across root and subdirectory deployments; only UI rendering adds the application base.
@@ -118,7 +156,11 @@
         clear() { localStorage.removeItem(quizKey); }
     };
     applyTheme(getTheme());
+    applyReading(getReadingStatus());
     media.addEventListener("change", () => applyTheme(getTheme()));
-    window.addEventListener("storage", event => { if (event.key === themeKey) applyTheme(getTheme()); });
+    window.addEventListener("storage", event => {
+        if (event.key === themeKey) applyTheme(getTheme());
+        if (event.key === readingKey) applyReading(getReadingStatus());
+    });
     document.addEventListener("error", event => { if (event.target instanceof HTMLImageElement) event.target.dataset.failed = "true"; }, true);
 })();
