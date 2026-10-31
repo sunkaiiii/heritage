@@ -10,7 +10,7 @@
     // 图鉴图：省份 × 类别的缩略格子。cells[i][j]：0 无内容、1 未点亮、2 已点亮
     function stampsImage(model) {
         const provinces = (Array.isArray(model?.provinces) ? model.provinces : []).slice(0, 40).map(x => text(x, 8));
-        const categories = (Array.isArray(model?.categories) ? model.categories : []).slice(0, 10).map(x => text(x, 6));
+        const categories = (Array.isArray(model?.categories) ? model.categories : []).slice(0, 10).map(x => text(x, 16));
         const cells = Array.isArray(model?.cells) ? model.cells : [];
         if (!provinces.length || !categories.length) fail("invalid");
         const size = 26, gap = 4, left = 150, top = 230, width = 1080;
@@ -25,8 +25,15 @@
         g.fillText(text(model.title, 30), 72, 64);
         g.fillStyle = colors.muted; g.font = font(28);
         g.fillText(text(model.progress, 80), 72, 140);
-        g.font = font(18); g.textAlign = "center";
-        categories.forEach((name, j) => g.fillText(name, left + j * (size * 2.6 + gap) + size * 1.3, top - 34));
+        g.textAlign = "center";
+        // 英文类别名较长：先缩小字号（最小 11px），仍放不下再截断加省略号，不再按字符数硬截断
+        const column = size * 2.6;
+        categories.forEach((name, j) => {
+            let px = 18, label = name;
+            for (g.font = font(px); px > 11 && g.measureText(label).width > column; px--) g.font = font(px - 1);
+            while (label.length > 1 && g.measureText(label).width > column) label = label.slice(0, -2) + "…";
+            g.fillText(label, left + j * (column + gap) + size * 1.3, top - 34);
+        });
         provinces.forEach((name, i) => {
             const y = top + i * (size + gap);
             g.textAlign = "right"; g.fillStyle = colors.muted; g.font = font(18);

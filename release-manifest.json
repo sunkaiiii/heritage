@@ -4,11 +4,11 @@
   "branch": "gh-pages",
   "base_path": "/heritage/",
   "site_url": "https://sunkaiiii.github.io/heritage/",
-  "source_commit": "2e8685212c0562720250e9f55f31c829131251d3",
+  "source_commit": "ba118a7dd4919cd4d8bc6dfa7995fc64d48c47d4",
   "source_dirty": false,
-  "created_utc": "2026-10-31T04:20:38.876273+00:00",
+  "created_utc": "2026-10-31T05:25:00.501419+00:00",
   "boot_sri_verified": 54,
-  "artifact_sha256": "2553a3aa231e572944ace66f9769a63e764b751c93b1be6b9f74c169918f6bcc",
+  "artifact_sha256": "d5b5eb92a0ddc6f83b07eb219690f8fc2c2e2b618a10989cbda4ff4090a3dd43",
   "files": {
     ".nojekyll": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -30,17 +30,17 @@
       "sha256": "98ae4363d0a7c69d8785d2ae5458904604c065ae0c1ba0d084ed70776a75f581",
       "bytes": 121656
     },
-    "_framework/Heritage.Contracts.e1gnn9bu08.wasm": {
-      "sha256": "f21b1fed53e89c541105a9257561ffa2d518b6ccb929d6a2f78ca87e93a0e105",
+    "_framework/Heritage.Contracts.iwkofhbaem.wasm": {
+      "sha256": "d202d1716d65f99f7866f736b55fa2e6d23efd7f901cfefb213a1828fe7cdc38",
       "bytes": 388885
     },
-    "_framework/Heritage.Web.Client.rkoa7l5toy.wasm": {
-      "sha256": "eb0563b0eee88a97468ebff6944e183ba3d2b138acc67b758ec7721cb46e8304",
+    "_framework/Heritage.Web.Client.iidw94c05k.wasm": {
+      "sha256": "96facd88c7513bafab045803531b589b8a53f8d456d31a54b51106e6bf7067aa",
       "bytes": 15125
     },
-    "_framework/Heritage.Web.UI.tgxobqbm99.wasm": {
-      "sha256": "6d825ce9aee350950efdae18550b59de15fbf17a3680c558e2f873be463dcd2e",
-      "bytes": 1359637
+    "_framework/Heritage.Web.UI.5ty6425w04.wasm": {
+      "sha256": "b911446bf13bf18e2e251a1130087cec55366c7d3b0c2cf3f4e6d01ceb6a8a02",
+      "bytes": 1365269
     },
     "_framework/Microsoft.AspNetCore.Components.Web.cvz9df4fyq.wasm": {
       "sha256": "2819305ff717f9cb8833030d427834b6ff836facb45eaa75cfaed6403b3a6931",
@@ -126,10 +126,6 @@
       "sha256": "a1b0a4f2e233f404ab87c016481ee67ded8245b1519f31c3bc538c5b71de691d",
       "bytes": 48405
     },
-    "_framework/System.Collections.8wcm6jqd5r.wasm": {
-      "sha256": "c8bc3526c5e979ae1f40161b1d992995b4327b025974acdead23de30e0ccc6f5",
-      "bytes": 30997
-    },
     "_framework/System.Collections.Concurrent.iqok4s2138.wasm": {
       "sha256": "c671a1503a561a15e68beaa809a567d513c257e0dc544ae6f85d0844cc4e65c1",
       "bytes": 23317
@@ -145,6 +141,10 @@
     "_framework/System.Collections.Specialized.hkm622xgcr.wasm": {
       "sha256": "c151faacbb8ccb740a7553c010f85652a3b945d09e4c6a55f6457a55e56b2b78",
       "bytes": 10005
+    },
+    "_framework/System.Collections.yliupmwnsk.wasm": {
+      "sha256": "4ab57941fbf3ef94974bb30bc97835bf7b44d201aaf792799b74866552a57bd9",
+      "bytes": 30997
     },
     "_framework/System.ComponentModel.Primitives.pcketdycpr.wasm": {
       "sha256": "77f0035054058799ea5130fec9792de0a205adf202e96f47f8cd158d9fca16b3",
@@ -170,9 +170,9 @@
       "sha256": "3afab2661d8162fd617863f4fa181e46ac3ceb39a5e60bc66d9a9d4d206a6706",
       "bytes": 6421
     },
-    "_framework/System.Linq.w461mkcq7n.wasm": {
-      "sha256": "b044cc63907306259bc2744228f499fc9fff3a65f9726797243c183ec5aab79d",
-      "bytes": 81685
+    "_framework/System.Linq.t41wfp7cqb.wasm": {
+      "sha256": "bdb05b13b683f7c6297993195e91bf310b3c51e15c4d589f95d490bbfce42ef0",
+      "bytes": 83221
     },
     "_framework/System.Memory.64nf189gsw.wasm": {
       "sha256": "c673f1f44dbcf30b188d5189c1690fd1686a286c71728444d55da98f0eb4097d",
@@ -194,9 +194,9 @@
       "sha256": "690236fe596e871290318b35e88e85dfc88bad0d914442f93c4342dc4537a226",
       "bytes": 5909
     },
-    "_framework/System.Private.CoreLib.8evb2pf2sj.wasm": {
-      "sha256": "b0296c115a4229634bcb97133b9b926fb97c01c5b3b98ee445b60f4931b62244",
-      "bytes": 1808661
+    "_framework/System.Private.CoreLib.31nlmc5cm8.wasm": {
+      "sha256": "29c21034813a9b769f108785a2a3f3fec15a6aa41ad1109a85a8c42befe811a0",
+      "bytes": 1809173
     },
     "_framework/System.Private.Uri.hvj4k31w34.wasm": {
       "sha256": "6332c28776ed5609eb2dd4506d992f37568c998372d3475df593f3035f70029c",
@@ -243,7 +243,7 @@
       "bytes": 60576
     },
     "_framework/dotnet.js": {
-      "sha256": "66e78f6b7000e83942b63f8d46eafd76028d948857f90783a56100407f22b9fa",
+      "sha256": "f43c360a5d0fbb9b255204889578ad55a85d85bc07a2cc8b358ecb38c87bb221",
       "bytes": 54007
     },
     "_framework/dotnet.native.f749u69f30.wasm": {
@@ -307,8 +307,8 @@
       "bytes": 28297
     },
     "poster.js": {
-      "sha256": "ade2188cb86b302555290c0b4f2d12c6c22375031974ebe3f84e0f5efeef5e11",
-      "bytes": 11164
+      "sha256": "c7cfc994d7e6107cc347ae29ce0c30f986340556bd68273ff2533abfcd16ad65",
+      "bytes": 11601
     },
     "qr.js": {
       "sha256": "7bfb4cbf9fc9b2051b70f5401c099062e4f20c7ed0bb0c27eff03b3731646700",
