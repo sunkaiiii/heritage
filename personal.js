@@ -11,7 +11,7 @@
     const validRoute = value => typeof value === "string" && value.length > 0 && value.length <= 640 && !/[\u0000-\u001f\u007f/\\?#]/.test(value) && ![".", ".."].includes(value);
     const validStep = value => typeof value === "string" && value.length > 0 && value.length <= 200 && !/[\u0000-\u001f\u007f,]/.test(value);
     const sourceKinds = ["content", "graph", "search", "learning", "personal", "discovery", "unknown"];
-    const appPaths = /^(?:\/(?:articles|directory|inheritors)\/[a-f\d]{24}|\/directory\/families(?:\/[^/?#]+)?|\/directory\/glossary|\/batches(?:\/\d{4})?|\/inheritors\/generations|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present|\/worksheet)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
+    const appPaths = /^(?:\/(?:articles|directory|inheritors)(?:\/[a-f\d]{24})?|\/directory\/families(?:\/[^/?#]+)?|\/directory\/glossary|\/batches(?:\/\d{4})?|\/inheritors\/generations|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present|\/worksheet)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
     let navigationSource = null, referrerAllowed = true;
     // Persist canonical paths so root-hosted bookmarks and reading paths survive a move to a subdirectory.
     // Navigation evidence, in contrast, must actually belong to the current base URI.
@@ -35,11 +35,12 @@
         const { url, pathname } = target;
         try {
             const query = new URLSearchParams();
-            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province", "ids", "family", "batches", "sort", "letter"]) {
+            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province", "ids", "family", "batches", "sort", "letter", "kind"]) {
                 const value = url.searchParams.get(key);
                 if (value && value.length <= 300 && !/[\u0000-\u001f\u007f]/.test(value)) query.set(key, value);
             }
-            const source = /^\/(articles|directory|inheritors)\//.test(pathname) ? "content" : pathname.startsWith("/graph") ? "graph" : pathname === "/search" ? "search" : pathname.startsWith("/learning-routes") ? "learning" : pathname.startsWith("/my") ? "personal" : "discovery";
+            // 只有详情页算「内容」；文章、名录、传承人列表与家族、词典、世代结构等页面算「发现」（交叉验收 J7）
+            const source = /^\/(?:articles|directory|inheritors)\/[a-f\d]{24}$/i.test(pathname) ? "content" : pathname.startsWith("/graph") ? "graph" : pathname === "/search" ? "search" : pathname.startsWith("/learning-routes") ? "learning" : pathname.startsWith("/my") ? "personal" : "discovery";
             return { href: pathname + (query.size ? "?" + query.toString() : ""), pathname, source };
         } catch { return null; }
     }
@@ -105,7 +106,8 @@
         }).filter(Boolean).slice(0, 200);
         state.readingPath = (Array.isArray(parsed.readingPath) ? parsed.readingPath : []).slice(0, 50).map(value => {
             const item = content(value);
-            const candidate = appLocation(value.fromHref, true), origin = candidate && sourceKinds.includes(value.source) && value.source === candidate.source ? candidate : null;
+            // 旧版把列表与统计页记成 content，读取时按现在的分类改正，不丢掉来源
+            const candidate = appLocation(value.fromHref, true), origin = candidate && sourceKinds.includes(value.source) && (value.source === candidate.source || (value.source === "content" && candidate.source === "discovery")) ? candidate : null;
             return item ? { ...item, createdAt: iso(value.createdAt), fromTitle: origin ? text(value.fromTitle, 300) : "", fromHref: origin?.href || null, source: origin?.source || "unknown" } : null;
         }).filter(Boolean);
         const routes = new Set();

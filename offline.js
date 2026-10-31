@@ -51,7 +51,7 @@
         update: () => zh() ? "E迹有新版本。点此更新（所有打开的 E迹 页面会一起刷新）" : "A new version of E迹 is ready. Update now (all open E迹 pages will reload)",
         offline: () => zh() ? "当前离线，只能阅读已存为离线的内容。" : "You are offline. Only content saved for offline reading is available."
     };
-    let registration = null, hadController = false, refreshing = false, lastUpdate = 0, environment = null, requestOffline = false;
+    let registration = null, hadController = false, refreshing = false, lastUpdate = 0, environment = null, requestOffline = false, started = Promise.resolve();
 
     // 本机只存开关：enabled＝读者开启过；paused＝配置关闭期间已清除缓存，配置恢复后要读者再点一次才重新下载
     function readState() {
@@ -153,7 +153,8 @@
             return;
         }
         if (readEnabled()) {
-            await register();
+            // 浏览器拒绝注册（如不支持 worker 的内置浏览器面板）时不抛出，status() 会报告 missing
+            try { await register(); } catch { /* 见 status() */ }
             document.addEventListener("visibilitychange", () => {
                 if (document.visibilityState === "visible" && registration && Date.now() - lastUpdate > 3600000) { lastUpdate = Date.now(); registration.update().catch(() => {}); }
             });
@@ -179,13 +180,16 @@
     window.heritageOffline = {
         rules,
         async status() {
+            await started;
             const env = environment || await loadEnvironment();
-            const reg = env.supported ? (registration || await ownRegistration()) : null;
+            const reg = env.supported ? (await ownRegistration()) : null;
             const entries = env.supported ? await contentEntries() : [];
             const local = readState();
+            // missing：开关为开但没有本站注册（浏览器清除了 worker 而保留了本机存储，或注册被拒绝），需要读者重新开启（交叉验收 J8）
+            const missing = env.supported && env.configEnabled !== false && local.enabled && !local.paused;
             return {
                 supported: env.supported, configEnabled: env.configEnabled, enabled: local.enabled, paused: local.paused,
-                state: !reg ? "none" : reg.active && !reg.installing ? "active" : reg.installing ? "installing" : reg.waiting ? "waiting" : "none",
+                state: !reg ? (missing ? "missing" : "none") : reg.active && !reg.installing ? "active" : reg.installing ? "installing" : reg.waiting ? "waiting" : "none",
                 controlled: Boolean(navigator.serviceWorker?.controller), count: entries.length, bytes: entries.reduce((sum, e) => sum + e.bytes, 0)
             };
         },
@@ -193,9 +197,12 @@
             const env = await loadEnvironment();
             if (!env.supported) throw new Error("offline_unsupported");
             if (env.configEnabled === false) throw new Error("offline_disabled");
+            const previous = localStorage.getItem(stateKey);
             localStorage.setItem(stateKey, JSON.stringify({ enabled: true, enabledAt: new Date().toISOString() }));
             try { await navigator.storage?.persist?.(); } catch { /* 可选：降低被回收的概率 */ }
-            await register();
+            // 注册被拒绝时恢复原来的开关，不留下「开着但没有注册」的状态
+            try { await register(); }
+            catch (error) { try { if (previous === null) localStorage.removeItem(stateKey); else localStorage.setItem(stateKey, previous); } catch { /* 存储不可用 */ } throw error; }
             // 经 .NET 互操作调用时没有 this，直接引用全局对象
             return window.heritageOffline.status();
         },
@@ -256,6 +263,6 @@
         // 从「在设置中开启离线阅读」链接进入时滚到设置小节（小节在 Blazor 渲染后才出现，浏览器自己的锚点跳转找不到它）
         reveal() { if (location.hash === "#offline") document.getElementById("offline")?.scrollIntoView({ block: "start" }); }
     };
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => startup().catch(() => {}));
-    else startup().catch(() => {});
+    if (document.readyState === "loading") started = new Promise(resolve => document.addEventListener("DOMContentLoaded", () => startup().catch(() => {}).then(resolve)));
+    else started = startup().catch(() => {});
 })();

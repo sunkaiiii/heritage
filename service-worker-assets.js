@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "cv3ncmcV",
+  "version": "UJ8+L/2a",
   "assets": [
     {
       "hash": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
@@ -22,16 +22,16 @@ self.assetsManifest = {
       "url": "_content/Heritage.Web.UI/Heritage.Web.UI.ulz2f3yj21.bundle.scp.css"
     },
     {
-      "hash": "sha256-HeOJBgngEGH5SNamK1NhAlcybLQB1wzm+GujLUv0mqg=",
-      "url": "_framework/Heritage.Contracts.retkrwpt5p.wasm"
+      "hash": "sha256-5YCvgmo64w9ue33lsQjBOv48/mP/ElmeEhPmTmmMz9k=",
+      "url": "_framework/Heritage.Contracts.5c38qtx3jz.wasm"
     },
     {
-      "hash": "sha256-DBWO8d4bFxb2iIMKHgaWkf3gjHrT0lrumGL79/3Tfzo=",
-      "url": "_framework/Heritage.Web.Client.8ft0ydac2j.wasm"
+      "hash": "sha256-HVJ7jYsqQNYsOwmv3PgLHCs3N2U/itVfp5vFD8Wt7u0=",
+      "url": "_framework/Heritage.Web.Client.hzm3b4whsp.wasm"
     },
     {
-      "hash": "sha256-sD9h7yVsuGbkYiBbYt0FaV9zRs9oFc8OyGhnuMGU02E=",
-      "url": "_framework/Heritage.Web.UI.0kk5dv42vf.wasm"
+      "hash": "sha256-K0Ik7Eb1/avgQ4FBmOFx0Gk1leyRqTwcZt2jFa3ndOI=",
+      "url": "_framework/Heritage.Web.UI.przbcyql7r.wasm"
     },
     {
       "hash": "sha256-KBkwX/cX+cuIMwMNQng0tv+Db6y0Xqp1z67WQDs6aTE=",
@@ -234,7 +234,7 @@ self.assetsManifest = {
       "url": "_framework/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-YQwEQpntnhhUxa0UwpKWh0RguwwHORd4UvW7VZ4W2gc=",
+      "hash": "sha256-He6U9XetJRt1YT8bLYXrQHtFyq7T4FcceIBmxDOFiws=",
       "url": "_framework/dotnet.js"
     },
     {
@@ -306,7 +306,7 @@ self.assetsManifest = {
       "url": "media-viewer.js"
     },
     {
-      "hash": "sha256-BmE7+2utE/VW+OJAm9uFoObwYPO6El0lE5jUUH8I9eI=",
+      "hash": "sha256-Sm4kbohER3JfR9zY7K9bfUeApcYLueCnL/p+p9OPHwk=",
       "url": "offline.js"
     },
     {
@@ -314,7 +314,7 @@ self.assetsManifest = {
       "url": "pages-routing.js"
     },
     {
-      "hash": "sha256-jgUhavHt+P4e+y5uFE6sTKHzyVqCckpWiQnYZlLAPtw=",
+      "hash": "sha256-goT+VnsZ9XvrgAUbNxtTwqaG2bBQxcr2nSFbfZTdr6c=",
       "url": "personal.js"
     },
     {
