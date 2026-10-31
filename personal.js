@@ -11,7 +11,7 @@
     const validRoute = value => typeof value === "string" && value.length > 0 && value.length <= 640 && !/[\u0000-\u001f\u007f/\\?#]/.test(value) && ![".", ".."].includes(value);
     const validStep = value => typeof value === "string" && value.length > 0 && value.length <= 200 && !/[\u0000-\u001f\u007f,]/.test(value);
     const sourceKinds = ["content", "graph", "search", "learning", "personal", "discovery", "unknown"];
-    const appPaths = /^(?:\/(?:articles|directory|inheritors)\/[a-f\d]{24}|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|research))?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
+    const appPaths = /^(?:\/(?:articles|directory|inheritors)\/[a-f\d]{24}|\/directory\/families(?:\/[^/?#]+)?|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
     let navigationSource = null, referrerAllowed = true;
     // Persist canonical paths so root-hosted bookmarks and reading paths survive a move to a subdirectory.
     // Navigation evidence, in contrast, must actually belong to the current base URI.
@@ -35,7 +35,7 @@
         const { url, pathname } = target;
         try {
             const query = new URLSearchParams();
-            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale"]) {
+            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province"]) {
                 const value = url.searchParams.get(key);
                 if (value && value.length <= 300 && !/[\u0000-\u001f\u007f]/.test(value)) query.set(key, value);
             }
@@ -120,12 +120,22 @@
     }
     // A backup restore only adds to this browser: nothing local is removed, a newer local record wins,
     // and identity, sync state and old pending operations are not taken from the file.
+    // Backup v2 adds optional sections registered by feature stores (window.heritageBackupSections, e.g. quiz).
+    // v1 files stay readable; older pages reject v2 because they only accept version 1.
+    const backupSections = () => window.heritageBackupSections || {};
     function backupPlan(value) {
-        if (typeof value !== "string" || value.length > 4000000) throw new Error("Invalid backup");
+        if (typeof value !== "string" || value.length > 6000000) throw new Error("Invalid backup");
         let parsed;
         try { parsed = JSON.parse(value); } catch { throw new Error("Invalid backup"); }
-        const personal = parsed && parsed.version === 1 && Array.isArray(parsed.favorites) ? parse(parsed.personal) : null;
+        const versionOk = parsed && (parsed.version === 1 || (parsed.version === 2 && parsed.sections && typeof parsed.sections === "object" && !Array.isArray(parsed.sections)));
+        const personal = versionOk && Array.isArray(parsed.favorites) ? parse(parsed.personal) : null;
         if (!personal) throw new Error("Invalid backup");
+        const sectionPlans = {};
+        if (parsed.version === 2) for (const [name, section] of Object.entries(backupSections())) {
+            if (!Object.hasOwn(parsed.sections, name)) continue;
+            const plan = section.plan(parsed.sections[name]);
+            sectionPlans[name] = plan || { preview: { invalid: true }, apply() {} };
+        }
         const state = read(), saved = window.heritageStore.getSaved(), keyOf = x => `${x.type}:${x.id}`;
         const savedKeys = new Set(saved.map(keyOf)), favoriteKeys = new Set();
         const valid = parsed.favorites.slice(0, 400).map(x => { const item = content(x); return item ? { ...item, savedAt: iso(x.savedAt) } : null; }).filter(Boolean);
@@ -135,8 +145,8 @@
         const history = personal.history.filter(x => !localHistory.has(keyOf(x)) || x.viewedAt > localHistory.get(keyOf(x)).viewedAt);
         const localProgress = new Map(state.progress.map(x => [x.routeId, x]));
         const progressItems = personal.progress.filter(x => !localProgress.has(x.routeId) || x.updatedAt > localProgress.get(x.routeId).updatedAt);
-        return { state, saved, addedFavorites, history, progressItems, localHistory, localProgress,
-            preview: { exportedAt: typeof parsed.exportedAt === "string" && !isNaN(Date.parse(parsed.exportedAt)) ? iso(parsed.exportedAt) : null,
+        return { state, saved, addedFavorites, history, progressItems, localHistory, localProgress, sectionPlans,
+            preview: { ...(Object.keys(sectionPlans).length ? { sections: Object.fromEntries(Object.entries(sectionPlans).map(([name, plan]) => [name, plan.preview])) } : {}), exportedAt: typeof parsed.exportedAt === "string" && !isNaN(Date.parse(parsed.exportedAt)) ? iso(parsed.exportedAt) : null,
                 favoritesAdded: addedFavorites.length, favoritesExisting: valid.length - favorites.length, favoritesInvalid: parsed.favorites.length - valid.length, favoritesOverLimit: favorites.length - addedFavorites.length,
                 historyAdded: history.filter(x => !localHistory.has(keyOf(x))).length, historyUpdated: history.filter(x => localHistory.has(keyOf(x))).length,
                 historyKeptLocal: personal.history.length - history.length,
@@ -253,7 +263,7 @@
             const keys = new Set(); const checked = all.filter(x => { const k = `${x.type}:${x.id}`; if (keys.has(k)) return false; keys.add(k); return true; }).slice(0, 200);
             localStorage.setItem(savedKey, JSON.stringify(checked));
         },
-        clearLocalData() { return favoriteTransaction(() => { const languageMode = read().languageMode; const state = empty(); state.languageMode = languageMode; localStorage.removeItem(savedKey); write(state); return summary(state); }); },
+        clearLocalData() { return favoriteTransaction(() => { const languageMode = read().languageMode; const state = empty(); state.languageMode = languageMode; localStorage.removeItem(savedKey); localStorage.removeItem("heritage.web.lastVisit.v1"); for (const section of Object.values(backupSections())) section.clear(); write(state); return summary(state); }); },
         previewBackup(value) { return backupPlan(value).preview; },
         restoreBackup(value) {
             return favoriteTransaction(() => {
@@ -265,12 +275,14 @@
                 state.progress = [...plan.progressItems, ...state.progress.filter(x => !plan.progressItems.some(y => y.routeId === x.routeId))].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 100);
                 localStorage.setItem(savedKey, JSON.stringify([...plan.saved, ...plan.addedFavorites].sort((a, b) => b.savedAt.localeCompare(a.savedAt)).slice(0, 200)));
                 write(state);
+                for (const sectionPlan of Object.values(plan.sectionPlans)) sectionPlan.apply();
                 return { ...summary(state), restore: plan.preview };
             });
         },
         downloadBackup() {
             const state = read();
-            const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), personal: state, favorites: window.heritageStore.getSaved() }, null, 2)], { type: "application/json;charset=utf-8" });
+            const sections = Object.fromEntries(Object.entries(backupSections()).map(([name, section]) => [name, section.export()]));
+            const blob = new Blob([JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), personal: state, favorites: window.heritageStore.getSaved(), sections }, null, 2)], { type: "application/json;charset=utf-8" });
             const url = URL.createObjectURL(blob), anchor = document.createElement("a"); anchor.href = url; anchor.download = "heritage-personal-backup.json"; anchor.click(); URL.revokeObjectURL(url);
         },
         openDialog(id) { const element = document.getElementById(id); if (element && element.tagName === "DIALOG" && !element.open) element.showModal(); }

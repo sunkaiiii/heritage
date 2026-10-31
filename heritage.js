@@ -50,6 +50,73 @@
         },
         removeSaved(id, type) { localStorage.setItem(savedKey, JSON.stringify(getSaved().filter(x => x.id !== id || x.type !== type))); }
     };
+    // 「新收录」来访记录：只有读者开启后才写入；只存在本机，不上传（docs/features/08）。
+    const visitKey = "heritage.web.lastVisit.v1";
+    const visitGap = 30 * 60 * 1000;
+    const isoOrNull = value => typeof value === "string" && value.length <= 64 && !isNaN(Date.parse(value)) ? new Date(value).toISOString() : null;
+    function readVisits() {
+        try {
+            const value = JSON.parse(localStorage.getItem(visitKey) || "null");
+            if (!value || value.enabled !== true) return { enabled: false, previousVisitAt: null, currentVisitAt: null };
+            return { enabled: true, previousVisitAt: isoOrNull(value.previousVisitAt), currentVisitAt: isoOrNull(value.currentVisitAt) };
+        } catch { return { enabled: false, previousVisitAt: null, currentVisitAt: null }; }
+    }
+    window.heritageVisits = {
+        get: readVisits,
+        enable() { const now = new Date().toISOString(); localStorage.setItem(visitKey, JSON.stringify({ enabled: true, previousVisitAt: null, currentVisitAt: now })); return readVisits(); },
+        disable() { localStorage.removeItem(visitKey); return readVisits(); },
+        // 30 分钟内重复打开不更新，避免一刷新「新」标记就消失。返回更新前用于比较的记录。
+        touch() {
+            const state = readVisits();
+            if (!state.enabled) return state;
+            const now = Date.now(), current = state.currentVisitAt ? Date.parse(state.currentVisitAt) : 0;
+            if (now - current >= visitGap) localStorage.setItem(visitKey, JSON.stringify({ enabled: true, previousVisitAt: state.currentVisitAt, currentVisitAt: new Date(now).toISOString() }));
+            return readVisits();
+        },
+        // 给列表中新收录的文章卡片加上标记；只处理 24 位内容编号
+        markNew(ids, label) {
+            const wanted = new Set((Array.isArray(ids) ? ids : []).filter(id => typeof id === "string" && /^[a-f\d]{24}$/i.test(id)));
+            for (const link of document.querySelectorAll("a[href*='/articles/']")) {
+                const id = (link.getAttribute("href") || "").split(/[?#]/, 1)[0].split("/").pop();
+                // 卡片的图片链接对读屏隐藏，只在可读的标题链接上标记一次
+                if (!wanted.has(id) || link.getAttribute("aria-hidden") === "true" || link.querySelector(".new-badge")) continue;
+                const badge = document.createElement("span"); badge.className = "new-badge"; badge.textContent = String(label || "新").slice(0, 12);
+                link.prepend(badge);
+            }
+        }
+    };
+    // 知识小测成绩：只在答完一组后写入，最多 100 条；纳入本机备份 v2 与清理（docs/features/03）。
+    const quizKey = "heritage.web.quiz.v1";
+    const quizScopes = ["route", "contents", "category", "region", "family", "random"];
+    function cleanQuiz(value) {
+        if (!value || !quizScopes.includes(value.scope) || !Number.isInteger(value.seed) || value.seed < 0) return null;
+        if (!Number.isInteger(value.total) || value.total < 1 || value.total > 10 || !Number.isInteger(value.correct) || value.correct < 0 || value.correct > value.total) return null;
+        const key = value.key === null || value.key === undefined ? null : typeof value.key === "string" && value.key.length <= 120 && !/[\u0000-\u001f\u007f]/.test(value.key) ? value.key : undefined;
+        const answeredAt = isoOrNull(value.answeredAt);
+        return key === undefined || !answeredAt ? null : { scope: value.scope, key, seed: value.seed, correct: value.correct, total: value.total, answeredAt };
+    }
+    function readQuiz() {
+        try { const values = JSON.parse(localStorage.getItem(quizKey) || "[]"); return Array.isArray(values) ? values.slice(0, 100).map(cleanQuiz).filter(Boolean) : []; }
+        catch { return []; }
+    }
+    const quizIdentity = x => `${x.scope}|${x.key}|${x.seed}|${x.answeredAt}`;
+    function writeQuiz(values) { localStorage.setItem(quizKey, JSON.stringify(values.sort((a, b) => b.answeredAt.localeCompare(a.answeredAt)).slice(0, 100))); }
+    window.heritageQuiz = {
+        list: readQuiz,
+        add(record) { const clean = cleanQuiz({ ...record, answeredAt: new Date().toISOString() }); if (!clean) throw new Error("Invalid quiz record"); writeQuiz([clean, ...readQuiz()]); return clean; }
+    };
+    window.heritageBackupSections = window.heritageBackupSections || {};
+    window.heritageBackupSections.quiz = {
+        export: readQuiz,
+        plan(value) {
+            if (!Array.isArray(value)) return null;
+            const local = readQuiz(), known = new Set(local.map(quizIdentity));
+            const valid = value.slice(0, 200).map(cleanQuiz).filter(Boolean), added = valid.filter(x => !known.has(quizIdentity(x)) && known.add(quizIdentity(x)));
+            return { preview: { added: added.length, existing: valid.length - added.length, invalid: Math.min(value.length, 200) - valid.length },
+                apply() { writeQuiz([...added, ...readQuiz()]); } };
+        },
+        clear() { localStorage.removeItem(quizKey); }
+    };
     applyTheme(getTheme());
     media.addEventListener("change", () => applyTheme(getTheme()));
     window.addEventListener("storage", event => { if (event.key === themeKey) applyTheme(getTheme()); });
