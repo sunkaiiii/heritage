@@ -4,11 +4,11 @@
   "branch": "gh-pages",
   "base_path": "/heritage/",
   "site_url": "https://sunkaiiii.github.io/heritage/",
-  "source_commit": "28a3c48973281e9ead5f78675ce7d6f3deb949b2",
+  "source_commit": "9f1730e9eab0add37636f0e334429f6db3fd5361",
   "source_dirty": false,
-  "created_utc": "2026-10-31T10:16:22.153389+00:00",
+  "created_utc": "2026-10-31T12:27:17.815991+00:00",
   "boot_sri_verified": 54,
-  "artifact_sha256": "00e26b2a6bb314c6e556a18b723f7dcd2b033cc413ac82478d3f7704db30f4ab",
+  "artifact_sha256": "14e43e5a84a9b557ddbf3aedbaeb57c48c410a1fd3cddcad85c5c94ba8da5861",
   "files": {
     ".nojekyll": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -30,17 +30,17 @@
       "sha256": "3ea4f8a3fbeb0a04d0c5346883466b8203673765ade1d913fa471fe7586d1260",
       "bytes": 127129
     },
-    "_framework/Heritage.Contracts.ww6wpcy4sl.wasm": {
-      "sha256": "008c8f0caee0d717e5a6d0b3eefeb018326e739c2ae5bb92c673dea787652ceb",
+    "_framework/Heritage.Contracts.retkrwpt5p.wasm": {
+      "sha256": "1de3890609e01061f948d6a62b53610257326cb401d70ce6f86ba32d4bf49aa8",
       "bytes": 439573
     },
-    "_framework/Heritage.Web.Client.blikao7ze9.wasm": {
-      "sha256": "1f757cb2a68161795f3ed92063e1a9f36f6ec750e262120b9cd3a98acd7c732a",
+    "_framework/Heritage.Web.Client.8ft0ydac2j.wasm": {
+      "sha256": "0c158ef1de1b1716f688830a1e069691fde08c7ad3d25aee9862fbf7fdd37f3a",
       "bytes": 15125
     },
-    "_framework/Heritage.Web.UI.ke6wtgl4d0.wasm": {
-      "sha256": "6cb53a93fdc6f3145a4e430bbedad68c57467a0fe10c7e152c049fd330e61f2f",
-      "bytes": 1567509
+    "_framework/Heritage.Web.UI.0kk5dv42vf.wasm": {
+      "sha256": "b03f61ef256cb866e462205b62dd05695f7346cf6815cf0ec86867b8c194d361",
+      "bytes": 1569557
     },
     "_framework/Microsoft.AspNetCore.Components.Web.cvz9df4fyq.wasm": {
       "sha256": "2819305ff717f9cb8833030d427834b6ff836facb45eaa75cfaed6403b3a6931",
@@ -243,7 +243,7 @@
       "bytes": 60576
     },
     "_framework/dotnet.js": {
-      "sha256": "0e39fe25f425f3a30e8ec9c5a4e18a85d837a6e145a095eb681ed36302df8d51",
+      "sha256": "610c044299ed9e1854c5ad14c29296874460bb0c0739177852f5bb559e16da07",
       "bytes": 54007
     },
     "_framework/dotnet.native.f749u69f30.wasm": {
@@ -263,8 +263,8 @@
       "bytes": 1526128
     },
     "app.css": {
-      "sha256": "96e0ab49d6036cbd28c69b3924cdd7ce46082879e3699c78a5af3bf0d42f0059",
-      "bytes": 76073
+      "sha256": "654410e917f62175ff7254ca9599d535840db597ad7aa7d1c05a7d5bde7fd0b4",
+      "bytes": 76669
     },
     "apple-touch-icon.png": {
       "sha256": "1a1a6666a1fc0d7a8f9486e065a923cdba051b98750d8457ee36182164812b2a",
@@ -287,8 +287,8 @@
       "bytes": 1606
     },
     "content-tools.js": {
-      "sha256": "9912b7bebe6cea8974e2ccf09f49ade730e74fa441662257aeb96f1e0787a2b5",
-      "bytes": 9222
+      "sha256": "6e53428e064446355edb3f931467ebb953215a604997669e337feceef805999d",
+      "bytes": 9822
     },
     "heritage.js": {
       "sha256": "282412763b5e609cd28100ea5880a165196d1459f2821cada2d5caa1b4debcf8",
@@ -335,11 +335,11 @@
       "bytes": 10299
     },
     "service-worker-assets.js": {
-      "sha256": "138ef7f6c4f4fcf80be1994b974de7e2b05a2c5d1a95d2eeb624764d2831409a",
+      "sha256": "b3e90cfc1c61a1f55416a5c964d4ad4983ab39b9e8b859fa2be99e6b44acd273",
       "bytes": 11763
     },
     "service-worker.js": {
-      "sha256": "e8c7b15f05c232d0d6a412a6a875c7e4601558cae72546b3faeed8038d4a0536",
+      "sha256": "7ac62a564273121b8be58ed33f95ac0d01afc5e3214aaba17c91e888fe823de6",
       "bytes": 7502
     },
     "shared-navigation.js": {

@@ -232,6 +232,32 @@ main:focus {
 .icon-button:hover {
     background:var(--surface-container);
 }
+/* 顶栏语言切换：比图标按钮宽，当前语言加粗 */
+.language-toggle {
+    width:auto;
+    padding:0 10px;
+    border:0;
+    border-radius:22px;
+    background:none;
+    color:inherit;
+    font:inherit;
+    font-size:13px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+    cursor:pointer;
+}
+.language-toggle span {
+    color:var(--muted);
+}
+.language-toggle b {
+    color:var(--text);
+    font-weight:600;
+}
+/* 窄屏规则把顶栏图标按钮压到 36px，语言切换要保持文字宽度 */
+.header-tools .icon-button.language-toggle {
+    width:auto;
+    padding:0 6px;
+}
 .button {
     display:inline-flex;
     align-items:center;

@@ -21,6 +21,15 @@
             return culture;
         }
     };
+    // 顶栏「中 / EN」：在中文与英文之间切换并重新载入（设置页「阅读语言」仍可选「跟随系统」）。
+    // 偏好写入 heritagePersonal（同时写 Server host 读取的 cookie），两个 host 都重新载入后生效。
+    document.addEventListener("click", event => {
+        if (!event.target?.closest?.("[data-language-toggle]")) return;
+        event.preventDefault();
+        try { window.heritagePersonal.setLanguage(/^en/i.test(document.documentElement?.lang || "") ? "zh-Hans" : "en"); }
+        catch { return; }
+        location.reload();
+    });
     window.heritageDownloads = {
         saveText(name, mime, text) {
             if (typeof text !== "string" || new TextEncoder().encode(text).length > maximum) throw new Error("File exceeds download limit");

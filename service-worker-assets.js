@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "pzIBP88o",
+  "version": "cv3ncmcV",
   "assets": [
     {
       "hash": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
@@ -22,16 +22,16 @@ self.assetsManifest = {
       "url": "_content/Heritage.Web.UI/Heritage.Web.UI.ulz2f3yj21.bundle.scp.css"
     },
     {
-      "hash": "sha256-AIyPDK7g1xflptCz7v6wGDJuc5wq5buSxnPep4dlLOs=",
-      "url": "_framework/Heritage.Contracts.ww6wpcy4sl.wasm"
+      "hash": "sha256-HeOJBgngEGH5SNamK1NhAlcybLQB1wzm+GujLUv0mqg=",
+      "url": "_framework/Heritage.Contracts.retkrwpt5p.wasm"
     },
     {
-      "hash": "sha256-H3V8sqaBYXlfPtkgY+Gp829ux1DiYhILnNOpis18cyo=",
-      "url": "_framework/Heritage.Web.Client.blikao7ze9.wasm"
+      "hash": "sha256-DBWO8d4bFxb2iIMKHgaWkf3gjHrT0lrumGL79/3Tfzo=",
+      "url": "_framework/Heritage.Web.Client.8ft0ydac2j.wasm"
     },
     {
-      "hash": "sha256-bLU6k/3G8xRaTkMLvtrWjFdGeg/hDH4VLASf0zDmHy8=",
-      "url": "_framework/Heritage.Web.UI.ke6wtgl4d0.wasm"
+      "hash": "sha256-sD9h7yVsuGbkYiBbYt0FaV9zRs9oFc8OyGhnuMGU02E=",
+      "url": "_framework/Heritage.Web.UI.0kk5dv42vf.wasm"
     },
     {
       "hash": "sha256-KBkwX/cX+cuIMwMNQng0tv+Db6y0Xqp1z67WQDs6aTE=",
@@ -234,7 +234,7 @@ self.assetsManifest = {
       "url": "_framework/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-Djn+JfQl86MOjsnFpOGKhdg3puFFoJXraB7TYwLfjVE=",
+      "hash": "sha256-YQwEQpntnhhUxa0UwpKWh0RguwwHORd4UvW7VZ4W2gc=",
       "url": "_framework/dotnet.js"
     },
     {
@@ -254,7 +254,7 @@ self.assetsManifest = {
       "url": "_framework/icudt.oh1zvcfom8.dat"
     },
     {
-      "hash": "sha256-luCrSdYDbL0oxps5JM3XzkYIKHnjaZx4pa878NQvAFk=",
+      "hash": "sha256-ZUQQ6Rf2IXX/clTKlZnVNYQNtZeteqfRwFp9W95/0LQ=",
       "url": "app.css"
     },
     {
@@ -278,7 +278,7 @@ self.assetsManifest = {
       "url": "client-startup.js"
     },
     {
-      "hash": "sha256-mRK3vr5s6ol04szwn0mt5zDnT6RBZiJXrrlvHgeHorU=",
+      "hash": "sha256-blNCjgZERjVe2z+TFGfruVMhWmBJl2aeM3/s7vgFmZ0=",
       "url": "content-tools.js"
     },
     {

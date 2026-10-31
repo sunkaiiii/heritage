@@ -1,4 +1,4 @@
-/* Manifest version: pzIBP88o */
+/* Manifest version: cv3ncmcV */
 // 离线阅读的发布版 Service Worker（docs/features/15）。只有读者在设置页开启后才会注册。
 // 外壳：按 SDK 生成的 service-worker-assets.js（含 SHA-256）整体缓存；内容：只服务读者「存为离线」的三类详情。
 // 只对四类请求 respondWith：作用域内导航、清单内外壳文件、appsettings.json、配置 API 下的三类详情；其余交给浏览器。
