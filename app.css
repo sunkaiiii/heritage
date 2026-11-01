@@ -3364,6 +3364,57 @@ html[data-reading-contrast=high] .detail-facts{background:var(--paper);border:1p
 
 .detail-facts dd > small.related-meta { margin-left:.5em; }
 
+/* 常被一起报道的项目（docs/features/28）与家族页目录 */
+.page-contents { display:flex; flex-wrap:wrap; gap:.4rem 1rem; margin:1rem 0; font-size:.9rem; }
+.page-contents a { color:var(--muted); }
+.family-together summary { cursor:pointer; }
+.family-together summary h2 { display:inline; }
+.family-together summary small { margin-left:.4rem; font-weight:400; }
+.together-list { list-style:none; padding:0; margin:.8rem 0; display:grid; gap:.5rem; }
+.together-list li { display:flex; flex-wrap:wrap; align-items:baseline; gap:.5rem; }
+.together-page .data-section { margin:2.5rem 0; }
+.together-graph { margin:1rem auto; max-width:460px; }
+.together-graph svg { width:100%; height:auto; }
+.together-edge { stroke:var(--primary); opacity:.55; }
+.together-edge-weak { stroke:var(--line); }
+.together-center { fill:var(--primary); }
+.together-center-label { fill:var(--on-primary); font-size:11px; }
+.together-node { fill:var(--surface-container); stroke:var(--primary); stroke-width:1.5; }
+.together-label { fill:var(--text); font-size:11px; }
+.together-graph a:focus-visible .together-node { stroke-width:3; }
+.together-table td, .together-table th { padding:.35rem .6rem; text-align:left; }
+@media (max-width:767px) { .together-graph { display:none; } }
+
+/* 少有人讲的非遗（docs/features/27） */
+.quiet-tabs { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:1rem 0; }
+.quiet-tabs a { display:flex; flex-direction:column; gap:.2rem; padding:12px 14px; border:1px solid var(--line); border-radius:6px; color:var(--text); }
+.quiet-tabs a.selected { border-color:var(--primary); box-shadow:inset 0 0 0 1px var(--primary); }
+.quiet-tabs strong { font-size:1.6rem; color:var(--primary); }
+.quiet-tabs small { color:var(--muted); }
+.quiet-bars { list-style:none; padding:0; margin:0; display:grid; gap:.35rem; }
+.quiet-bars li { display:grid; grid-template-columns:10rem 1fr 9rem; align-items:center; gap:.6rem; font-size:.9rem; }
+.quiet-bar { display:block; height:10px; background:var(--surface-container); border-radius:2px; overflow:hidden; }
+.quiet-bar > span { display:block; height:100%; background:var(--primary); }
+.quiet-list { padding-left:1.4rem; }
+.quiet-list li { margin:.6rem 0; }
+.quiet-list li small { margin-left:.5rem; }
+.quiet-list p { margin:.2rem 0; color:var(--muted); font-size:.9rem; }
+@media (max-width:600px) { .quiet-bars li { grid-template-columns:6.5rem 1fr; } .quiet-bars li small { grid-column:1 / -1; } }
+
+/* 那年今日（docs/features/32） */
+.on-this-day-head { display:flex; align-items:center; gap:.8rem; margin:1rem 0; }
+.on-this-day-head h2 { margin:0; font-size:1.4rem; }
+.on-this-day-group { margin:1.6rem 0; }
+.on-this-day-group h3 { font-size:1.1rem; margin:0 0 .5rem; }
+.on-this-day-group h3 small { margin-left:.4rem; font-weight:400; }
+.on-this-day-list { padding-left:1.4rem; }
+.on-this-day-list li { margin:.7rem 0; }
+.on-this-day-list li small { margin-left:.5rem; }
+.on-this-day-list p { margin:.2rem 0; color:var(--muted); font-size:.92rem; }
+.on-this-day-families { font-size:.85rem; }
+.on-this-day-card { list-style:none; padding:0; margin:.6rem 0 0; display:grid; gap:.4rem; }
+.on-this-day-card small { margin-left:.5rem; }
+
 /* 材料与技法索引（docs/features/22） */
 .materials-page .content-note > span { margin-left:.3em; }
 .facet-cards { list-style:none; padding:0; margin:1rem 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
@@ -3388,11 +3439,67 @@ html[data-reading-contrast=high] .detail-facts{background:var(--paper);border:1p
 .facet-tags > li:has(details[open]) { flex-basis:100%; }
 .facet-tags details .facet-quote { margin:.4rem 0; }
 /* 19 号单位类型 × 类别、22 号材料 × 技法共用的计数矩阵 */
-.units-page .data-section, .materials-page .data-section { margin:2.5rem 0; }
-.units-page .data-section > h2, .materials-page .data-section > h2 { font-size:1.5rem; margin-bottom:.6rem; }
+.units-page .data-section, .materials-page .data-section, .quiet-page .data-section { margin:2.5rem 0; }
+.units-page .data-section > h2, .materials-page .data-section > h2, .quiet-page .data-section > h2 { font-size:1.5rem; margin-bottom:.6rem; }
 .units-matrix { border-collapse:separate; border-spacing:3px; font-size:.9rem; }
 .units-matrix th { padding:.35rem .6rem; font-weight:500; white-space:nowrap; text-align:center; }
 .units-matrix tbody th { text-align:right; }
 .units-matrix td { min-width:3rem; height:2.4rem; padding:0; text-align:center; border-radius:4px; font-variant-numeric:tabular-nums; }
 .units-matrix td a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; min-height:2.4rem; color:var(--text); }
 .units-matrix td a:hover, .units-matrix td a:focus-visible { outline:2px solid var(--primary); outline-offset:-2px; border-radius:4px; }
+
+/* 一条名录的时间线（docs/features/26） */
+.item-timeline > details > summary { cursor:pointer; }
+.item-timeline > details > summary h2 { display:inline; }
+.item-timeline > details > summary small { margin-left:.5rem; font-weight:400; font-size:.95rem; }
+.timeline-chart { margin:1rem 0 .5rem; }
+.timeline-chart svg { width:100%; height:auto; display:block; }
+.timeline-row-label { fill:var(--muted); font-size:11px; }
+.timeline-axis { fill:var(--muted); font-size:10px; }
+.timeline-baseline { stroke:var(--line); }
+.timeline-hit { fill:transparent; }
+.timeline-column a:hover .timeline-hit, .timeline-column.selected .timeline-hit { fill:var(--surface-container); }
+.timeline-self { fill:var(--primary); }
+.timeline-family { fill:none; stroke:var(--primary); stroke-width:1.5; }
+.timeline-people { fill:var(--primary); opacity:.6; }
+.timeline-articles { fill:var(--primary); }
+.timeline-articles-general { fill:var(--primary-soft); stroke:var(--primary); stroke-width:.5; }
+.timeline-images { fill:var(--muted); opacity:.55; }
+.timeline-table summary { cursor:pointer; color:var(--primary); margin:.5rem 0; }
+.timeline-table table { border-collapse:collapse; font-size:.9rem; }
+.timeline-table th, .timeline-table td { padding:.3rem .6rem; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap; }
+.timeline-table th:first-child, .timeline-table thead th { text-align:left; }
+.timeline-table tr.selected { background:var(--surface-container); }
+.timeline-year { margin-top:1.2rem; padding-top:.8rem; border-top:1px solid var(--line); }
+.timeline-year h3 a { font-size:.9rem; font-weight:400; margin-left:.6rem; }
+.timeline-year h4 { margin:1rem 0 .3rem; }
+
+/* 一个地方的非遗（docs/features/30） */
+.place-page .data-section { margin:2.2rem 0; }
+.place-counts { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:1rem 0 1.5rem; }
+.place-counts > div { padding:12px 14px; border:1px solid var(--line); border-radius:6px; }
+.place-counts > div.selected { border-color:var(--primary); box-shadow:inset 0 0 0 1px var(--primary); }
+.place-counts dt { color:var(--muted); font-size:.9rem; }
+.place-counts dd { margin:0; font-size:1.6rem; color:var(--primary); }
+.place-back { font-size:.9rem; font-weight:400; margin-left:.6rem; }
+.place-chips { list-style:none; padding:0; margin:.6rem 0; display:flex; flex-wrap:wrap; gap:.4rem .9rem; }
+.place-chips li small { margin-left:.3rem; }
+.place-group { margin:1rem 0 1.4rem; }
+.place-group h3 { margin:0 0 .3rem; font-size:1.05rem; }
+.place-group h3 small { font-weight:400; }
+.place-tree .section-heading h2 { white-space:nowrap; }
+.place-page .region-crumbs { display:flex; flex-wrap:wrap; gap:.4rem .8rem; font-size:.75rem; color:var(--muted); margin:0 0 2rem; }
+.place-page .region-crumbs a { color:inherit; text-decoration:none; }
+
+/* 传承谱系（docs/features/29） */
+.lineage-list { list-style:none; padding:0; margin:.4rem 0 1rem; display:grid; gap:.8rem; }
+.lineage-list small { margin-left:.4rem; }
+.lineage-quote { margin:.35rem 0 0; padding:.2rem 0 .2rem .8rem; border-left:3px solid var(--line); color:var(--muted); font-size:.92rem; }
+.lineage-quote strong { color:var(--text); }
+.family-lineage summary { cursor:pointer; }
+.family-lineage summary h2 { display:inline; }
+.family-lineage summary small { margin-left:.4rem; font-weight:400; }
+.lineage-table { border-collapse:collapse; font-size:.92rem; }
+.lineage-table th, .lineage-table td { padding:.45rem .6rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+.lineage-table td:nth-child(-n+2) { white-space:nowrap; }
+.lineage-table td small { display:block; margin:0; }
