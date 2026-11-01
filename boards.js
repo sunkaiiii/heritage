@@ -155,11 +155,15 @@
         addItem(boardId, item) {
             const entry = cleanItem({ ...item, note: "", prompt: null, addedAt: new Date().toISOString() });
             if (!entry) fail("item_invalid");
-            return update(boardId, board => {
+            let added = false;
+            const result = update(boardId, board => {
                 if (board.items.some(x => x.type === entry.type && x.id === entry.id)) return;
                 if (board.items.length >= limits.perBoard) fail("board_full");
-                board.items.push(entry);
+                board.items.push(entry); added = true;
             });
+            // 年报的年度计数（docs/features/25）：只在真的加入之后累加；未加载或失败都不影响加入
+            if (added) window.heritageYearly?.bump("boardItems");
+            return result;
         },
         removeItem(boardId, type, id) { return update(boardId, board => { board.items = board.items.filter(x => x.type !== type || x.id !== id); }); },
         moveItem(boardId, type, id, delta) {

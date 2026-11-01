@@ -3104,3 +3104,295 @@ html[data-reading-contrast=high] .detail-facts{background:var(--paper);border:1p
 .offline-list{margin:12px 0 0;padding-left:20px;display:grid;gap:8px}
 .offline-list small{margin-left:6px;color:var(--muted)}
 @media print{.offline-banner,.save-offline,.offline-badge{display:none}}
+/* 正文里的名录（docs/features/17）：浅色虚线下划线与外部链接区分；小卡片随悬停或聚焦显示，Esc 收起 */
+.mention {
+    position:relative;
+}
+.mention-link {
+    color:inherit;
+    text-decoration:underline dashed color-mix(in srgb,var(--primary) 55%,transparent);
+    text-underline-offset:3px;
+}
+.mention-link:hover,.mention-link:focus-visible {
+    color:var(--primary);
+}
+.mention-card {
+    display:none;
+    position:absolute;
+    left:0;
+    top:calc(100% + 4px);
+    z-index:20;
+    min-width:200px;
+    max-width:min(320px,80vw);
+    padding:10px 12px;
+    background:var(--surface-high);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--muted);
+    box-shadow:0 6px 18px color-mix(in srgb,var(--line) 40%,transparent);
+}
+.mention-card strong {
+    display:block;
+    color:var(--text);
+}
+.mention-card-line {
+    display:block;
+}
+.mention:hover>.mention-card,.mention:focus-within>.mention-card {
+    display:block;
+}
+.mention>.mention-link[data-card-dismissed]+.mention-card {
+    display:none;
+}
+.mention-summary .mention-rules {
+    margin-top:12px;
+    font-size:12px;
+    color:var(--muted);
+}
+.mentioned-in .mention-snippet {
+    display:block;
+    margin-top:4px;
+    color:var(--muted);
+}
+.mentioned-in .tab-row {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-block:12px;
+}
+/* 窄屏时卡片固定在屏幕底部，靠近右边缘的链接也不会撑出横向滚动 */
+@media (max-width:600px) {
+    .mention-card {
+        position:fixed;
+        left:16px;
+        right:16px;
+        top:auto;
+        bottom:16px;
+        min-width:0;
+        max-width:none;
+    }
+}
+@media print {
+    .mention-card {
+        display:none !important;
+    }
+}
+/* 民族专题（docs/features/18） */
+.ethnic-group-grid {
+    list-style:none;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:12px;
+    padding:0;
+    margin:20px 0;
+}
+.ethnic-group-grid a {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    height:100%;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--paper);
+    color:var(--text);
+    font-size:12px;
+}
+.ethnic-group-grid a:hover {
+    border-color:var(--primary);
+}
+.ethnic-group-grid strong {
+    font-family:var(--font-display);
+    font-size:16px;
+}
+.ethnic-group-grid small {
+    color:var(--muted);
+}
+.ethnic-item-list {
+    list-style:none;
+    padding:0;
+    margin:12px 0;
+}
+.ethnic-item-list li {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    gap:4px 12px;
+    padding:10px 0;
+    border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);
+}
+.ethnic-item-list li>a:first-child {
+    flex:1 1 260px;
+    color:var(--text);
+}
+.ethnic-item-list .related-meta {
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+}
+.ethnic-tags {
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    margin-top:4px;
+}
+.ethnic-line span {
+    color:var(--muted);
+}
+.ethnic-tags .status-tag {
+    display:inline-block;
+    padding:1px 8px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--surface-container);
+    color:var(--muted);
+    font-size:11px;
+}
+
+/* 非遗影像馆（docs/features/23）：固定比例的格子，图片 object-fit: cover，不需要宽高 */
+.gallery-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:12px;
+    margin:16px 0;
+    padding:0;
+    list-style:none;
+}
+.gallery-grid-compact { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
+.gallery-grid figure { margin:0; }
+.gallery-grid a[data-preview-image] {
+    display:block;
+    aspect-ratio:4/3;
+    overflow:hidden;
+    border-radius:6px;
+    background:var(--surface-container);
+}
+.gallery-grid a[data-preview-image]:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.gallery-grid img { width:100%; height:100%; object-fit:cover; display:block; }
+.gallery-grid figcaption {
+    margin-top:6px;
+    font-size:.82rem;
+    line-height:1.5;
+    color:var(--muted);
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+.gallery-grid figcaption small { display:block; }
+.gallery-more { text-align:center; margin:16px 0 32px; }
+.related-images h3 { font-size:.95rem; margin:16px 0 4px; }
+.media-viewer-details { max-width:48rem; margin:0 auto; padding:0 16px 16px; font-size:.85rem; line-height:1.7; color:#ede0dc; }
+.media-viewer-details p { margin:.25rem 0; }
+.media-viewer-details a { color:#ffd8d1; }
+.media-viewer-details .related-meta { color:#cbb8b2; }
+@media (max-width:600px) {
+    .gallery-grid, .gallery-grid-compact { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+}
+
+/* 我的非遗年报（docs/features/25） */
+.year-picker { display:flex; flex-wrap:wrap; gap:.3rem; margin:1rem 0; }
+.year-picker a { display:inline-flex; align-items:center; justify-content:center; min-width:64px; min-height:44px; padding:0 .8rem; border:1px solid var(--line); border-radius:3px; color:var(--text); }
+.year-picker a.selected { background:var(--primary); border-color:var(--primary); color:var(--on-primary); }
+.year-cover h2 { font-size:clamp(1.6rem,4vw,2.4rem); margin:.5rem 0 1rem; }
+.year-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:0 0 1rem; }
+.year-stats div { border:1px solid var(--line); border-radius:6px; padding:12px 14px; }
+.year-stats dt { font-size:.85rem; color:var(--muted); }
+.year-stats dd { margin:.2rem 0 0; font-size:1.8rem; font-weight:600; color:var(--primary); }
+.year-section { margin:2rem 0; }
+.year-section h3 { font-size:1.15rem; margin:0 0 .6rem; }
+.year-bars { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:6px; align-items:end; height:160px; }
+.year-bar { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:4px; }
+.year-bar small { font-size:.75rem; color:var(--muted); }
+.year-bar-total { font-size:.75rem; font-weight:500; font-variant-numeric:tabular-nums; min-height:1em; }
+.year-bar-stack { display:flex; flex-direction:column-reverse; width:100%; min-height:0; border-radius:3px 3px 0 0; overflow:hidden; }
+.year-bar-stack span { display:block; min-height:2px; }
+.kind-read { background:var(--primary); }
+.kind-saved { background:#b5652b; }
+.kind-stamped { background:#735c23; }
+.kind-quiz { background:#4f6b5a; }
+.kind-boardItems { background:#5a5f8a; }
+.kind-routesDone { background:#8a5a7a; }
+.year-legend { display:flex; flex-wrap:wrap; gap:.4rem 1rem; list-style:none; padding:0; margin:.6rem 0; font-size:.85rem; color:var(--muted); }
+.year-legend .swatch { display:inline-block; width:12px; height:12px; border-radius:2px; margin-right:.35rem; vertical-align:-1px; }
+.year-category-bars { list-style:none; padding:0; margin:0; display:grid; gap:.35rem; }
+.year-category-bars li { display:grid; grid-template-columns:9rem 1fr 3rem; align-items:center; gap:.6rem; font-size:.9rem; }
+.year-category-bar { display:block; height:12px; background:var(--primary); border-radius:2px; }
+.year-category-bars strong { text-align:right; }
+.year-new { margin-left:.3em; }
+.year-top { padding-left:1.4rem; }
+.year-top li { margin:.3rem 0; }
+@media (max-width:600px) {
+    .year-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .year-category-bars li { grid-template-columns:6.5rem 1fr 2.5rem; }
+}
+/* 打印：一页 A4（25 §3.4）。柱子上方印各月合计，方格地图印省名与数字；数据表与说明折叠在 details 里，纸上不印 */
+@media print {
+    @page { size:A4; margin:12mm; }
+    body:has(.year-report) .site-header, body:has(.year-report) .site-footer, body:has(.year-report) .skip-link,
+    body:has(.year-report) .category-tabs, body:has(.year-report) .page-heading, .year-picker, .year-actions, body:has(.year-report) #blazor-error-ui,
+    .year-report details, .year-report .tile-count-map > .content-note, .year-report .map-legend { display:none !important; }
+    html:has(.year-report) { font-size:9pt; }
+    body:has(.year-report) .container { max-width:none; padding:0; margin:0; }
+    .year-report { column-count:2; column-gap:8mm; }
+    .year-report > .year-cover, .year-report > .year-section:has(.year-bars), .year-report > .year-summary { column-span:all; }
+    .year-cover h2 { font-size:1.5rem; margin:0 0 .4rem; }
+    .year-stats { gap:6px; margin:0 0 .3rem; }
+    .year-stats div { border-color:#888; padding:6px 10px; }
+    .year-stats dd { font-size:1.3rem; }
+    .year-section { break-inside:avoid; margin:0 0 .5rem; }
+    .year-section h3 { font-size:1rem; margin:0 0 .3rem; }
+    .year-section p, .year-report .content-note { margin:.2rem 0; }
+    .year-report p, .year-report li, .year-report .content-note { font-size:8.5pt; line-height:1.4; }
+    .year-bars { height:80px; }
+    .year-legend { margin:.3rem 0; font-size:.75rem; }
+    .year-report .tile-count-map .tile-grid { gap:2px; max-width:62mm; grid-template-columns:repeat(7,minmax(0,1fr)); }
+    .year-report .tile-count-map h2, .year-report .tile-count-map h3 { font-size:.9rem; margin:.2rem 0; }
+    .year-report .tile-count-map .map-tile { min-height:0; min-width:0; padding:1px; }
+    .year-report .tile-count-map .map-tile span { font-size:.55rem; }
+    .year-report .tile-count-map .map-tile strong { font-size:.7rem; }
+    .year-report .tile-count-map .map-outside { margin-top:.3rem; }
+    .year-report .tile-count-map .map-outside .map-tile { min-height:0; }
+    .year-category-bars { gap:.15rem; }
+    .year-category-bars li { grid-template-columns:10rem 1fr 2rem; gap:.4rem; }
+    .year-category-bar { height:8px; }
+    .year-top li { margin:.1rem 0; }
+    .year-report * { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+}
+
+.detail-facts dd > small.related-meta { margin-left:.5em; }
+
+/* 材料与技法索引（docs/features/22） */
+.materials-page .content-note > span { margin-left:.3em; }
+.facet-cards { list-style:none; padding:0; margin:1rem 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.facet-cards > li { border:1px solid var(--line); border-radius:6px; padding:12px 14px; display:flex; flex-direction:column; gap:.4rem; }
+.facet-card-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:.4rem; color:var(--text); }
+.facet-card-title strong { font-size:1.25rem; }
+.facet-card-title small, .facet-pinyin { color:var(--muted); }
+.facet-pinyin { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin:.6rem 0 .3rem; }
+.facet-children { font-size:.85rem; margin:0; color:var(--muted); }
+.facet-children small { margin-left:.2rem; color:var(--muted); }
+.facet-categories { list-style:none; padding:0; margin:0; display:grid; gap:.2rem; font-size:.8rem; }
+.facet-categories li { display:grid; grid-template-columns:6.5rem 1fr 2rem; align-items:center; gap:.4rem; }
+.facet-bar { display:block; height:8px; background:var(--primary); border-radius:2px; }
+.facet-items { padding-left:1.4rem; }
+.facet-items li { margin:.8rem 0; }
+.facet-quote { margin:.3rem 0 0; padding:.3rem .8rem; border-left:3px solid var(--line); color:var(--muted); font-size:.9rem; }
+.facet-quote strong { color:var(--text); }
+.facet-group h3 { font-size:.95rem; margin:.8rem 0 .3rem; }
+.facet-tags { list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:.4rem; }
+.facet-tags > li > a, .facet-tags > li > span, .facet-tags summary { display:inline-flex; align-items:center; min-height:36px; padding:0 .7rem; border:1px solid var(--primary); border-radius:999px; color:var(--primary); cursor:pointer; }
+.facet-tags > li.is-name-match > a, .facet-tags > li.is-name-match > span { border-color:var(--line); color:var(--muted); }
+.facet-tags > li:has(details[open]) { flex-basis:100%; }
+.facet-tags details .facet-quote { margin:.4rem 0; }
+/* 19 号单位类型 × 类别、22 号材料 × 技法共用的计数矩阵 */
+.units-page .data-section, .materials-page .data-section { margin:2.5rem 0; }
+.units-page .data-section > h2, .materials-page .data-section > h2 { font-size:1.5rem; margin-bottom:.6rem; }
+.units-matrix { border-collapse:separate; border-spacing:3px; font-size:.9rem; }
+.units-matrix th { padding:.35rem .6rem; font-weight:500; white-space:nowrap; text-align:center; }
+.units-matrix tbody th { text-align:right; }
+.units-matrix td { min-width:3rem; height:2.4rem; padding:0; text-align:center; border-radius:4px; font-variant-numeric:tabular-nums; }
+.units-matrix td a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; min-height:2.4rem; color:var(--text); }
+.units-matrix td a:hover, .units-matrix td a:focus-visible { outline:2px solid var(--primary); outline-offset:-2px; border-radius:4px; }

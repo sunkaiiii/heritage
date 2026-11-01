@@ -321,3 +321,21 @@ button.text-link:disabled[b-0275ncok16] {
 @media(max-width:900px){.map-layout[b-5mrjka7kfl]{grid-template-columns:1fr}}
 @media(max-width:640px){.tile-grid[b-5mrjka7kfl],.map-outside[b-5mrjka7kfl]{gap:3px}.map-tile span[b-5mrjka7kfl]{font-size:.62rem}.map-tile strong[b-5mrjka7kfl]{font-size:.78rem}.map-timeline[b-5mrjka7kfl]{flex-direction:column;gap:.5rem}.batch-ticks button[b-5mrjka7kfl]{font-size:.7rem;padding:.2rem 0}.batch-ticks small[b-5mrjka7kfl]{display:none}.map-controls[b-5mrjka7kfl]{gap:.8rem}.map-switch button[b-5mrjka7kfl]{padding:.5rem .7rem}}
 @media(prefers-reduced-motion:reduce){.map-tile[b-5mrjka7kfl]{transition:none}}
+/* _content/Heritage.Web.UI/../Heritage.Web/Components/Shared/TileCountMap.razor.rz.scp.css */
+/* 只读的方格地图（docs/features/18、22）：样式与 02 号方格地图一致 */
+.tile-grid[b-0o543jecor]{display:grid;grid-template-columns:repeat(7,minmax(44px,1fr));grid-template-rows:repeat(8,auto);gap:4px;max-width:38rem}
+.map-tile[b-0o543jecor]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;aspect-ratio:1;min-height:44px;min-width:44px;padding:2px;border:1px solid transparent;border-radius:3px;color:var(--text);font:inherit;cursor:pointer;transition:background-color .6s ease,color .6s ease}
+.map-tile span[b-0o543jecor]{font-size:.75rem;line-height:1.1;white-space:nowrap}
+.map-tile strong[b-0o543jecor]{font-size:.95rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.1}
+.map-tile:hover[b-0o543jecor]{border-color:var(--text)}
+.map-tile:focus-visible[b-0o543jecor]{outline:3px solid var(--text);outline-offset:1px}
+.map-outside[b-0o543jecor]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;max-width:38rem;margin-top:1rem}
+.map-outside .map-tile[b-0o543jecor]{aspect-ratio:auto;min-height:60px;background:var(--surface-container);border:1px dashed var(--line)}
+.map-outside .map-tile span[b-0o543jecor]{white-space:normal;text-align:center}
+.map-legend[b-0o543jecor]{list-style:none;display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;padding:0;margin:1rem 0 0;font-size:.75rem;color:var(--muted)}
+.map-legend li[b-0o543jecor]{display:flex;align-items:center;gap:.4rem}
+.swatch[b-0o543jecor]{display:inline-block;width:1rem;height:1rem;border:1px solid var(--line)}
+.map-tile[b-0o543jecor]{text-decoration:none}
+.map-tile.is-empty[b-0o543jecor]{cursor:default}
+@media(max-width:640px){.tile-grid[b-0o543jecor],.map-outside[b-0o543jecor]{gap:3px}.map-tile span[b-0o543jecor]{font-size:.62rem}.map-tile strong[b-0o543jecor]{font-size:.78rem}}
+@media(prefers-reduced-motion:reduce){.map-tile[b-0o543jecor]{transition:none}}

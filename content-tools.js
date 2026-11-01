@@ -90,9 +90,28 @@
             strip.scrollLeft = Math.max(0, left);
         }
     }
+    // Article image anchors (#img-N) and gallery tiles after "load more" (#g-N), docs/features/23: the content streams in after navigation,
+    // so the browser or router handles the hash before the figure exists. Jump once per address when it
+    // appears (instantly: a smooth scroll aims at stale coordinates), then keep it aligned for a moment
+    // while images above it load and change the layout, unless the reader starts scrolling.
+    let revealedAnchor = null, settleUntil = 0;
+    function alignImageAnchor() {
+        const target = document.getElementById(location.hash.slice(1));
+        if (target) target.scrollIntoView({ block: "start", behavior: "instant" });
+        return !!target;
+    }
+    function revealImageAnchor() {
+        if (!/^#(?:img|g)-\d{1,5}$/.test(location.hash) || revealedAnchor === location.href || !alignImageAnchor()) return;
+        revealedAnchor = location.href;
+        settleUntil = Date.now() + 3000;
+    }
+    document.addEventListener("load", event => {
+        if (event.target?.tagName === "IMG" && Date.now() < settleUntil && revealedAnchor === location.href) alignImageAnchor();
+    }, true);
+    for (const name of ["wheel", "touchstart", "keydown", "mousedown"]) document.addEventListener(name, () => { settleUntil = 0; }, { capture: true, passive: true });
     if (typeof MutationObserver === "function" && document.documentElement) {
         let queued = false;
-        new MutationObserver(() => { if (!queued) { queued = true; setTimeout(() => { queued = false; revealSelected(); }, 0); } })
+        new MutationObserver(() => { if (!queued) { queued = true; setTimeout(() => { queued = false; revealSelected(); revealImageAnchor(); }, 0); } })
             .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
     }
     // Same-page section links move keyboard focus with the view, so the next Tab continues

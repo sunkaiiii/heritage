@@ -42,6 +42,7 @@
             url: safeUrl(anchor.getAttribute("href")),
             fallbacks: fallbacks(anchor),
             caption: anchor.querySelector("img")?.alt || anchor.getAttribute("aria-label") || "",
+            details: anchor.getAttribute("data-preview-details") || "",
             anchor
         })).filter(item => item.url && !seen.has(item.url) && seen.add(item.url));
     }
@@ -165,6 +166,16 @@
         fingerprint = JSON.stringify([catalogPage, index, ...gallery.map(entry => [entry.url, entry.caption])]);
         dialog.querySelector("[data-media-counter]").textContent = `${index + 1} / ${gallery.length}`;
         dialog.querySelector("[data-media-caption]").textContent = item.caption;
+        // Optional details (gallery: credit, linked projects, source article) are server-rendered,
+        // hidden nodes on the page; clone them instead of building markup from strings.
+        const details = dialog.querySelector("[data-media-details]");
+        if (details) {
+            const source = item.details ? document.getElementById(item.details) : null;
+            const copy = source?.cloneNode(true);
+            if (copy) { copy.removeAttribute("id"); copy.hidden = false; details.replaceChildren(copy); }
+            else details.replaceChildren();
+            details.hidden = !copy;
+        }
         dialog.querySelector("[data-media-previous]").disabled = gallery.length < 2;
         dialog.querySelector("[data-media-next]").disabled = gallery.length < 2;
         loadCurrent();

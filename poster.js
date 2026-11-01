@@ -176,5 +176,68 @@
         }
     });
 
-    window.heritagePoster = { stampsImage, render };
+    // 年报海报（docs/features/25 §3.3）：标题、四个数字、方格地图缩略图、小结、站点二维码；内容标题只在读者勾选后才有
+    function yearImage(model) {
+        const stats = (Array.isArray(model?.stats) ? model.stats : []).slice(0, 4).map(x => [text(x?.[0], 16), text(x?.[1], 12)]);
+        const tiles = (Array.isArray(model?.tiles) ? model.tiles : []).slice(0, 40)
+            .filter(t => Number.isInteger(t?.row) && Number.isInteger(t?.column) && t.row >= 0 && t.row < 12 && t.column >= 0 && t.column < 12)
+            .map(t => ({ label: text(t.label, 8), row: t.row, column: t.column, state: t.state === 2 ? 2 : t.state === 1 ? 1 : 0 }));
+        const titles = (Array.isArray(model?.titles) ? model.titles : []).slice(0, 5).map(x => text(x, 40)).filter(Boolean);
+        if (stats.length !== 4 || !tiles.length) fail("invalid");
+        const width = 1080, tile = 64, gap = 6, mapTop = 470;
+        const rows = Math.max(...tiles.map(t => t.row)) + 1, columns = Math.max(...tiles.map(t => t.column)) + 1;
+        const mapLeft = (width - columns * (tile + gap)) / 2;
+        const canvas = document.createElement("canvas"), probe = canvas.getContext("2d");
+        if (!probe) fail("unsupported");
+        // 按宽度折行：中文逐字、英文按词都能放下
+        function wrap(value, size, max) {
+            probe.font = font(size);
+            const lines = []; let line = "";
+            for (const part of text(value, 400).split(/(?<=[\s，。；、,.;])|(?=[\u4e00-\u9fff])/)) {
+                if (probe.measureText(line + part).width > max && line) { lines.push(line.trim()); line = part.trimStart(); } else line += part;
+            }
+            if (line.trim()) lines.push(line.trim());
+            return lines.slice(0, 5);
+        }
+        const summary = wrap(model.summary, 28, width - 144);
+        const height = mapTop + rows * (tile + gap) + 60 + summary.length * 42 + (titles.length ? 60 + titles.length * 38 : 0) + 120;
+        canvas.width = width; canvas.height = height;
+        const g = canvas.getContext("2d");
+        g.fillStyle = colors.paper; g.fillRect(0, 0, width, height);
+        g.fillStyle = colors.primary; g.fillRect(0, 0, width, 12);
+        g.textBaseline = "top"; g.fillStyle = colors.ink; g.font = font(54, 600);
+        g.fillText(text(model.title, 30), 72, 64);
+        stats.forEach(([label, value], i) => {
+            const x = 72 + (i % 2) * 340, y = 170 + Math.floor(i / 2) * 140;
+            g.fillStyle = colors.muted; g.font = font(24); g.fillText(label, x, y);
+            g.fillStyle = colors.primary; g.font = font(60, 600); g.fillText(value, x, y + 36);
+        });
+        g.textAlign = "center"; g.textBaseline = "middle";
+        for (const t of tiles) {
+            const x = mapLeft + t.column * (tile + gap), y = mapTop + t.row * (tile + gap);
+            if (t.state) { g.fillStyle = t.state === 2 ? colors.gold : colors.primary; g.fillRect(x, y, tile, tile); g.fillStyle = "#ffffff"; }
+            else { g.strokeStyle = colors.line; g.lineWidth = 1; g.strokeRect(x + 0.5, y + 0.5, tile - 1, tile - 1); g.fillStyle = colors.muted; }
+            g.font = font(16); g.fillText(t.label, x + tile / 2, y + tile / 2);
+        }
+        g.textAlign = "left"; g.textBaseline = "top";
+        let y = mapTop + rows * (tile + gap) + 40;
+        g.fillStyle = colors.ink; g.font = font(28);
+        for (const line of summary) { g.fillText(line, 72, y); y += 42; }
+        if (titles.length) {
+            y += 20; g.fillStyle = colors.muted; g.font = font(24, 600); g.fillText(text(model.titlesHeading, 20), 72, y); y += 40;
+            g.font = font(24); titles.forEach((title, i) => { g.fillText(`${i + 1}. ${title}`, 72, y); y += 38; });
+        }
+        g.fillStyle = colors.muted; g.font = font(22);
+        g.fillText(text(model.footer, 40), 72, height - 80);
+        if (typeof model.qrText === "string" && model.qrText && window.heritageQr) {
+            const m = window.heritageQr.matrix(model.qrText), qrSize = 150, cell = Math.floor(qrSize / (m.length + 4)), x0 = width - 72 - qrSize, y0 = 48;
+            g.fillStyle = "#ffffff"; g.fillRect(x0, y0, qrSize, qrSize);
+            g.fillStyle = "#000000";
+            const offset = (qrSize - cell * m.length) / 2;
+            m.forEach((row, my) => row.forEach((dark, mx) => { if (dark) g.fillRect(x0 + offset + mx * cell, y0 + offset + my * cell, cell, cell); }));
+        }
+        return canvas.toDataURL("image/png");
+    }
+
+    window.heritagePoster = { stampsImage, render, yearImage };
 })();

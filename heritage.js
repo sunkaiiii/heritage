@@ -141,7 +141,7 @@
     function writeQuiz(values) { localStorage.setItem(quizKey, JSON.stringify(values.sort((a, b) => b.answeredAt.localeCompare(a.answeredAt)).slice(0, 100))); }
     window.heritageQuiz = {
         list: readQuiz,
-        add(record) { const clean = cleanQuiz({ ...record, answeredAt: new Date().toISOString() }); if (!clean) throw new Error("Invalid quiz record"); writeQuiz([clean, ...readQuiz()]); return clean; }
+        add(record) { const clean = cleanQuiz({ ...record, answeredAt: new Date().toISOString() }); if (!clean) throw new Error("Invalid quiz record"); writeQuiz([clean, ...readQuiz()]); window.heritageYearly?.bump("quiz", { correct: clean.correct, total: clean.total }); return clean; }
     };
     window.heritageBackupSections = window.heritageBackupSections || {};
     window.heritageBackupSections.quiz = {
@@ -163,4 +163,13 @@
         if (event.key === readingKey) applyReading(getReadingStatus());
     });
     document.addEventListener("error", event => { if (event.target instanceof HTMLImageElement) event.target.dataset.failed = "true"; }, true);
+    // 正文里的名录（docs/features/17）：Esc 收起当前链接的小卡片，离开链接后恢复
+    document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
+        const link = document.activeElement;
+        if (link instanceof HTMLElement && link.classList.contains("mention-link")) link.dataset.cardDismissed = "true";
+    });
+    document.addEventListener("focusout", event => {
+        if (event.target instanceof HTMLElement && event.target.classList.contains("mention-link")) delete event.target.dataset.cardDismissed;
+    });
 })();

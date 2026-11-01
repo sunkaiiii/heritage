@@ -11,7 +11,7 @@
     const validRoute = value => typeof value === "string" && value.length > 0 && value.length <= 640 && !/[\u0000-\u001f\u007f/\\?#]/.test(value) && ![".", ".."].includes(value);
     const validStep = value => typeof value === "string" && value.length > 0 && value.length <= 200 && !/[\u0000-\u001f\u007f,]/.test(value);
     const sourceKinds = ["content", "graph", "search", "learning", "personal", "discovery", "unknown"];
-    const appPaths = /^(?:\/(?:articles|directory|inheritors)(?:\/[a-f\d]{24})?|\/directory\/families(?:\/[^/?#]+)?|\/directory\/glossary|\/batches(?:\/\d{4})?|\/inheritors\/generations|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present|\/worksheet)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
+    const appPaths = /^(?:\/(?:articles|directory|inheritors)(?:\/[a-f\d]{24})?|\/directory\/families(?:\/[^/?#]+)?|\/directory\/glossary|\/directory\/materials(?:\/(?:material|tool|technique)\/[^/?#]+)?|\/ethnic-groups(?:\/[^/?#]+)?|\/units(?:\/u_[a-f\d]{12})?|\/gallery|\/batches(?:\/\d{4})?|\/inheritors\/generations|\/new|\/calendar(?:\/festivals\/[a-z]{1,40})?|\/quiz|\/graph(?:\/(?:content\/(?:article|directoryItem|inheritor)\/[a-f\d]{24}|topic\/(?:region|category|year|kind|projectCode)\/[^/?#]+|trail|path|bridge|edge))?|\/search|\/learning-routes(?:\/[^/?#]+)?|\/my(?:\/(?:favorites|history|learning|journeys|boards|research|stamps|year))?|\/my\/boards\/b_[a-f\d]{16}(?:\/present|\/worksheet)?|\/explore(?:\/[^/?#]+)?|\/discover(?:\/[^/?#]+)?)$/i;
     let navigationSource = null, referrerAllowed = true;
     // Persist canonical paths so root-hosted bookmarks and reading paths survive a move to a subdirectory.
     // Navigation evidence, in contrast, must actually belong to the current base URI.
@@ -35,7 +35,7 @@
         const { url, pathname } = target;
         try {
             const query = new URLSearchParams();
-            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province", "ids", "family", "batches", "sort", "letter", "kind"]) {
+            for (const key of ["tab", "view", "strategy", "mode", "q", "type", "difficulty", "seedType", "seedKey", "page", "item", "id", "topicType", "key", "sample", "fromType", "fromId", "toType", "toId", "depth", "limit", "topics", "ai", "relation", "source", "entity", "confidence", "stale", "days", "year", "month", "date", "scope", "seed", "count", "target", "batch", "category", "province", "ids", "family", "batches", "sort", "letter", "kind", "evidence", "ethnicity", "ipage", "basis", "familyq", "y", "facet", "with"]) {
                 const value = url.searchParams.get(key);
                 if (value && value.length <= 300 && !/[\u0000-\u001f\u007f]/.test(value)) query.set(key, value);
             }
@@ -208,18 +208,21 @@
             if (typeof type !== "string" || !Object.hasOwn(prefixes, type) || typeof id !== "string" || !/^[a-f\d]{24}$/i.test(id) || typeof isSaved !== "boolean") throw new Error("Invalid favorite");
             const state = read(); enqueue(state, { kind: isSaved ? "favorite-upsert" : "favorite-delete", targetType: type, targetId: id }); write(state);
         },
-        toggleFavorite(value) { return favoriteTransaction(() => { const saved = window.heritageStore.toggleSaved(value); window.heritagePersonal.queueFavorite(value.type, value.id, saved); return saved; }); },
+        toggleFavorite(value) { const saved = favoriteTransaction(() => { const saved = window.heritageStore.toggleSaved(value); window.heritagePersonal.queueFavorite(value.type, value.id, saved); return saved; }); if (saved) window.heritageYearly?.bump("saved"); return saved; },
         removeFavorite(id, type) { return favoriteTransaction(() => { window.heritageStore.removeSaved(id, type); window.heritagePersonal.queueFavorite(type, id, false); }); },
         recordHistory(value) {
             const item = content(value); if (!item) throw new Error("Invalid history item");
             return recordItem(item,text(value.lastPosition,1000));
         },
-        recordCurrentReading(value) {
+        // context：详情页已有的类别与地区，只交给年报的年度计数（docs/features/25），不进浏览历史
+        recordCurrentReading(value, context = null) {
             const item=content(value);if(!item||appLocation(window.location.href)?.pathname!==item.href)throw new Error("Reading target must match the current page");
             const fraction=scrollRange()?Math.max(0,Math.min(1,Number(window.scrollY||0)/scrollRange())):0;
             let origin=navigationSource?.destination===item.href?navigationSource:null;
             if(!origin&&referrerAllowed){const referrer=appLocation(document.referrer);if(referrer&&referrer.pathname!==item.href)origin={...referrer,title:""};}
-            return recordItem(item,"scroll:v1:"+fraction.toFixed(6),origin);
+            const result=recordItem(item,"scroll:v1:"+fraction.toFixed(6),origin);
+            window.heritageYearly?.bump("read",{category:context?.category,region:context?.region});
+            return result;
         },
         restoreReadingPosition(type,id) {
             if(typeof type!=="string"||!Object.hasOwn(prefixes,type)||typeof id!=="string"||!/^[a-f\d]{24}$/i.test(id)||appLocation(window.location.href)?.pathname!==`/${prefixes[type]}/${id}`)return false;
@@ -233,8 +236,10 @@
         clearReadingPath() { const state = read(); state.readingPath = []; write(state); return summary(state); },
         saveProgress(value) {
             const item = progress(value); if (!item) throw new Error("Invalid route progress");
-            const state = read(); enqueue(state, { kind: "progress-upsert", ...item });
-            state.progress = [item, ...state.progress.filter(x => x.routeId !== item.routeId)].slice(0, 100); write(state); return item;
+            const state = read(), wasDone = !!state.progress.find(x => x.routeId === item.routeId)?.completedAt; enqueue(state, { kind: "progress-upsert", ...item });
+            state.progress = [item, ...state.progress.filter(x => x.routeId !== item.routeId)].slice(0, 100); write(state);
+            if (item.completedAt && !wasDone) window.heritageYearly?.bump("routesDone");
+            return item;
         },
         restartProgress(routeId, routeTitle, stepCount) {
             if (!validRoute(routeId)) throw new Error("Invalid route progress");

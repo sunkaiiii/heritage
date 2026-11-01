@@ -56,7 +56,11 @@
             known.add(identity(stamp)); added.push(stamp);
             if (!lit.has(cell(stamp))) { lit.add(cell(stamp)); newCells.push({ province: stamp.province, category: stamp.category }); }
         }
-        if (added.length) { state.stamps = [...added, ...state.stamps]; write(state); }
+        if (added.length) {
+            state.stamps = [...added, ...state.stamps]; write(state);
+            // 年报的年度计数（docs/features/25）：每个新图章累加一次，带类别与省份
+            for (const stamp of added) window.heritageYearly?.bump("stamped", { category: stamp.category, province: stamp.province });
+        }
         return { added: added.length, newCells, invalid };
     }
     function mergePlan(value) {
