@@ -101,7 +101,8 @@
         return !!target;
     }
     function revealImageAnchor() {
-        if (!/^#(?:img|g)-\d{1,5}$/.test(location.hash) || revealedAnchor === location.href || !alignImageAnchor()) return;
+        // 正文段落锚点 #block-n（README 第六轮共用部分第 4 条）同样会晚于页面到达，一起处理
+        if (!/^#(?:img|g|block)-\d{1,5}$/.test(location.hash) || revealedAnchor === location.href || !alignImageAnchor()) return;
         revealedAnchor = location.href;
         settleUntil = Date.now() + 3000;
     }

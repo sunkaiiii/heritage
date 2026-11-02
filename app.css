@@ -1068,7 +1068,7 @@ main:focus {
     justify-content:center;
     margin-top:22px;
 }
-.bookmark-button {
+.bookmark-button,.follow-button {
     display:inline-flex;
     align-items:center;
     justify-content:center;
@@ -1081,14 +1081,14 @@ main:focus {
     color:var(--text);
     font-size:12px;
 }
-.bookmark-button:hover,.bookmark-button[aria-pressed=true] {
+.bookmark-button:hover,.bookmark-button[aria-pressed=true],.follow-button:hover,.follow-button[aria-pressed=true] {
     color:var(--primary);
     border-color:var(--primary);
 }
 .bookmark-button[aria-pressed=true] .icon {
     fill:var(--primary-soft);
 }
-.bookmark-control {
+.bookmark-control,.follow-control {
     position:relative;
 }
 .local-feedback {
@@ -3575,3 +3575,92 @@ html[data-reading-notes="off"] .term-plain, html:not([data-reading-notes]) .term
 .term-note-facet { color:var(--muted); font-size:.85rem; }
 .term-note-close { align-self:flex-end; margin-top:.3rem; background:none; border:1px solid var(--line); border-radius:4px; padding:.15rem .6rem; color:var(--text); cursor:pointer; }
 
+
+/* 别名与旧称（docs/features/43）：详情标题下一行与检索页提示行 */
+.item-aliases { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.95rem; }
+.alias-hint { margin: 0 0 1rem; padding: 0.75rem 1rem; border-left: 3px solid var(--primary); background: var(--surface-low); }
+.alias-hint p { margin: 0.25rem 0; }
+
+/* 传承人荣誉与称号（docs/features/44） */
+.honor-kind { margin: 1rem 0 0.25rem; font-size: 1rem; }
+.honor-list { margin: 0; padding-left: 1.25rem; }
+.honor-list li { margin: 0.35rem 0; }
+.honor-list .text-link { margin-left: 0.5rem; }
+.honor-quote summary { cursor: pointer; color: var(--muted); font-size: 0.9rem; }
+
+/* 原文句子问答（docs/features/45） */
+.answers-form .answers-question { flex: 1 1 16rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.answers-form input[type="search"] { width: 100%; }
+.answers-list { padding-left: 1.25rem; }
+.answers-list li { margin: 0 0 1rem; }
+.answers-text { margin: 0 0 0.25rem; line-height: 1.8; }
+.answers-text mark { background: var(--primary-soft); color: inherit; padding: 0 0.1em; }
+.answers-entry { margin: 0 0 0.5rem; }
+
+/* 「原文」链接到达的段落（README 第六轮共用部分第 4 条）：浏览器支持文本片段时另有句子高亮 */
+.reading-body [id^="block-"]:target { background: var(--primary-soft); border-radius: 4px; box-shadow: 0 0 0 0.35rem var(--primary-soft); }
+
+/* 那一年在报道什么（docs/features/48）：年份故事里的「这一年的报道」 */
+.year-reporting h3 { font-size: 1rem; margin: 1.5rem 0 0.35rem; }
+.year-reporting-months { margin: 1rem 0; max-width: 100%; overflow-x: auto; }
+.year-reporting-months svg { display: block; width: 100%; max-width: 560px; min-width: 300px; height: auto; }
+.year-reporting-bar { fill: var(--primary); }
+.year-reporting-count, .year-reporting-month { font-size: 9px; fill: var(--muted); }
+.year-reporting-list { margin: 0.5rem 0; padding-left: 1.5rem; columns: 2 16rem; column-gap: 2rem; }
+.year-reporting-list li { margin: 0.3rem 0; break-inside: avoid; }
+.year-reporting-list a { display: inline-flex; gap: 0.5rem; flex-wrap: wrap; color: inherit; }
+.year-reporting-list a:hover span, .year-reporting-list a:focus-visible span { color: var(--primary); text-decoration: underline; }
+.year-reporting-list strong { font-weight: 500; color: var(--muted); font-size: 0.9em; }
+
+/* 我关注的项目（docs/features/47）：「我的 › 关注」 */
+.follow-seen { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+.follow-seen p { margin: 0; }
+.follow-list { list-style: none; margin: 1rem 0; padding: 0; }
+.follow-row { border-top: 1px solid var(--line); padding: 1rem 0; }
+.follow-row.has-updates .follow-title { color: var(--primary); }
+.follow-head { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; align-items: baseline; }
+.follow-title { font-weight: 600; }
+.follow-remove { margin-left: auto; }
+.follow-workspace button.text-link { border: 0; background: none; padding: 0 0.25rem; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.follow-workspace button.text-link:hover:not(:disabled) { color: var(--primary); }
+.follow-workspace button.text-link:disabled { opacity: 0.45; cursor: default; text-decoration: none; }
+.follow-updates { margin-top: 0.5rem; }
+.follow-updates details, .follow-none { margin: 0.25rem 0; font-size: 0.95em; }
+.follow-none { color: var(--muted); }
+.follow-updates summary { cursor: pointer; color: var(--primary); }
+.follow-sublist { margin: 0.5rem 0; padding-left: 1.5rem; }
+.follow-sublist li { margin: 0.25rem 0; }
+.follow-sublist a { color: inherit; }
+.follow-sublist a span { color: var(--muted); margin-right: 0.35rem; }
+.follow-images { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.5rem; }
+.follow-images img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 3px; background: var(--surface-container); }
+.follow-pager { display: flex; gap: 0.75rem; align-items: center; font-size: 12px; }
+
+/* 类别长读（docs/features/49）：七节长读，数字链接到模块页面，「本页计算」点开是明细 */
+.category-longread { margin: 2rem 0; }
+.longread-tools { margin-bottom: 1rem; }
+.longread-section { border-top: 1px solid var(--line); padding: 1.5rem 0 0.5rem; }
+.longread-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; }
+.longread-heading h2 { margin: 0; }
+.longread-sentence { line-height: 1.9; margin: 0.6rem 0; max-width: 46rem; }
+.longread-sentence a { color: var(--primary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.longread-sentence strong { font-weight: 600; }
+.longread-inline { list-style: none; padding: 0; margin: 0.4rem 0; display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.longread-detail-list { margin: 0.5rem 0; padding-left: 1.5rem; columns: 2 16rem; column-gap: 2rem; }
+.longread-detail-list li { margin: 0.25rem 0; break-inside: avoid; }
+.longread-local { margin: 0.5rem 0; }
+.longread-local summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.longread-terms { display: grid; gap: 0.35rem; margin: 0.5rem 0; }
+.longread-terms div { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 0.75rem; }
+.longread-terms dt { color: var(--muted); }
+.longread-terms dd { margin: 0; }
+.longread-bars { margin: 1rem 0; max-width: 100%; overflow-x: auto; }
+.longread-bars svg { display: block; width: 100%; max-width: 420px; min-width: 240px; height: auto; }
+.longread-bar { fill: var(--primary); }
+.longread-bars a:focus-visible .longread-bar, .longread-bars a:hover .longread-bar { fill: var(--text); }
+.longread-bar-count, .longread-bar-label { font-size: 10px; fill: var(--muted); }
+@media print {
+    .longread-tools, .longread-heading .text-link { display: none; }
+    .longread-section, .category-longread .tile-count-map { break-inside: avoid-page; }
+    .longread-local[open] summary { display: none; }
+}
