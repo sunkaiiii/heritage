@@ -19,7 +19,7 @@
     // 只设置 <html> 的 data-reading-* 属性，由样式覆盖阅读区域，不修改根字号。
     const readingKey = "heritage.web.reading.v1";
     const readingChoices = { size: ["standard", "large", "xlarge"], spacing: ["standard", "loose"], rate: [0.8, 1, 1.2] };
-    const readingDefaults = { size: "standard", spacing: "standard", contrast: false, rate: 1, follow: true };
+    const readingDefaults = { size: "standard", spacing: "standard", contrast: false, rate: 1, follow: true, notes: null };
     function cleanReading(value) {
         const source = value && typeof value === "object" ? value : {};
         return {
@@ -27,7 +27,9 @@
             spacing: readingChoices.spacing.includes(source.spacing) ? source.spacing : readingDefaults.spacing,
             contrast: source.contrast === true,
             rate: readingChoices.rate.includes(source.rate) ? source.rate : readingDefaults.rate,
-            follow: source.follow !== false
+            follow: source.follow !== false,
+            // 术语小注（docs/features/41）：没有设置过时为 null，页面按数据决定默认值
+            notes: ["on", "off"].includes(source.notes) ? source.notes : null
         };
     }
     function getReadingStatus() {
@@ -43,6 +45,7 @@
         if (value.size === "standard") delete root.readingSize; else root.readingSize = value.size;
         if (value.spacing === "standard") delete root.readingSpacing; else root.readingSpacing = value.spacing;
         if (value.contrast) root.readingContrast = "high"; else delete root.readingContrast;
+        if (value.notes) root.readingNotes = value.notes; else delete root.readingNotes;
     }
     window.heritageReading = {
         get: getReadingStatus,

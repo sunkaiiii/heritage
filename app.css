@@ -3399,6 +3399,16 @@ html[data-reading-contrast=high] .detail-facts{background:var(--paper);border:1p
 .quiet-list li { margin:.6rem 0; }
 .quiet-list li small { margin-left:.5rem; }
 .quiet-list p { margin:.2rem 0; color:var(--muted); font-size:.9rem; }
+/* 传承人情况观察（docs/features/36）：标签用中性的描边样式，不用警示色 */
+.watch-counts { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+.watch-counts strong { font-size:1.4rem; }
+.watch-filters fieldset { border:0; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:.3rem 1rem; }
+.watch-filters legend { font-size:.8rem; color:var(--muted); margin-bottom:.2rem; }
+.watch-filters fieldset label { display:inline-flex; gap:.35rem; align-items:center; font-size:.88rem; }
+.watch-tags { display:flex; flex-wrap:wrap; gap:.35rem; }
+.watch-tag { display:inline-block; padding:0 .45rem; border:1px solid var(--line); border-radius:.3rem; font-size:.82rem; color:var(--muted); }
+.inheritance-watch-note span + span::before { content:" "; }
+.inheritance-watch-note .text-link { margin-left:.4rem; }
 @media (max-width:600px) { .quiet-bars li { grid-template-columns:6.5rem 1fr; } .quiet-bars li small { grid-column:1 / -1; } }
 
 /* 那年今日（docs/features/32） */
@@ -3496,6 +3506,17 @@ html[data-reading-contrast=high] .detail-facts{background:var(--paper);border:1p
 .lineage-list small { margin-left:.4rem; }
 .lineage-quote { margin:.35rem 0 0; padding:.2rem 0 .2rem .8rem; border-left:3px solid var(--line); color:var(--muted); font-size:.92rem; }
 .lineage-quote strong { color:var(--text); }
+/* 传承人小传年表（docs/features/35） */
+.inheritor-chronicle > details > summary { cursor:pointer; }
+.inheritor-chronicle > details > summary h2 { display:inline; }
+.inheritor-chronicle > details > summary small { margin-left:.5rem; font-weight:400; font-size:.95rem; }
+.chronicle-list { list-style:none; padding:0; margin:.6rem 0 .8rem; display:grid; gap:.55rem; }
+.chronicle-row { display:grid; grid-template-columns:minmax(4.2rem, max-content) 1fr; gap:.8rem; align-items:baseline; }
+.chronicle-year { font-variant-numeric:tabular-nums; font-weight:600; color:var(--text); white-space:nowrap; }
+.chronicle-text { color:var(--muted); line-height:1.6; }
+.chronicle-text strong { color:var(--text); }
+.chronicle-kind { display:inline-block; margin-right:.45rem; padding:0 .4rem; border:1px solid var(--line); border-radius:.3rem; font-size:.82rem; color:var(--text); }
+.chronicle-more > summary { cursor:pointer; color:var(--primary); margin:.2rem 0; }
 .family-lineage summary { cursor:pointer; }
 .family-lineage summary h2 { display:inline; }
 .family-lineage summary small { margin-left:.4rem; font-weight:400; }
@@ -3503,3 +3524,54 @@ html[data-reading-contrast=high] .detail-facts{background:var(--paper);border:1p
 .lineage-table th, .lineage-table td { padding:.45rem .6rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
 .lineage-table td:nth-child(-n+2) { white-space:nowrap; }
 .lineage-table td small { display:block; margin:0; }
+/* 世界级名录对照（docs/features/38） */
+.check-label { display:inline-flex; gap:.4rem; align-items:center; font-size:.88rem; }
+.unesco-line small, .detail-facts dd small.related-meta { margin-left:.35rem; }
+.detail-facts .fact-wide { grid-column:1 / -1; }
+/* 保护区与示范基地画像（docs/features/37）：涉及地方用小标签，不用整行链接 */
+.related-reading .eco-zone-places a { display:inline; margin:0; font-size:.92rem; color:var(--primary); }
+.eco-zone-category { margin:1rem 0 .3rem; font-size:1rem; }
+.eco-zone-category small { margin-left:.4rem; font-weight:400; color:var(--muted); }
+.eco-zone-county-only > summary { cursor:pointer; color:var(--muted); margin:.4rem 0; }
+.place-zones a + a { margin-left:.2rem; }
+/* 系列报道（docs/features/34） */
+.series-list { padding-left:1.4rem; }
+.series-list li { margin:.8rem 0; }
+.series-list li small { margin-left:.5rem; }
+.series-list p { margin:.2rem 0; color:var(--muted); font-size:.9rem; }
+.series-articles { list-style:none; padding:0; margin:1rem 0; display:grid; gap:.7rem; }
+.series-articles li { display:grid; grid-template-columns:2.6rem 1fr; gap:.6rem; align-items:baseline; scroll-margin-top:5rem; }
+.series-articles li:target { background:var(--surface-container); }
+.series-articles small { display:block; margin-top:.15rem; }
+.series-index { font-variant-numeric:tabular-nums; color:var(--muted); text-align:right; }
+.series-line { margin:.4rem 0 0; font-size:.9rem; color:var(--muted); }
+.series-line .icon { vertical-align:-2px; }
+.series-nav { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.8rem; margin:1.5rem 0; }
+.series-nav a { display:flex; flex-direction:column; gap:.2rem; padding:.7rem .9rem; border:1px solid var(--line); border-radius:6px; color:var(--text); text-decoration:none; }
+.series-nav a:hover { border-color:var(--primary); }
+.series-nav small { color:var(--muted); }
+.series-nav .series-next { text-align:right; }
+.article-links { margin:.4rem 0 1rem; }
+/* 资料变更记录（docs/features/40） */
+.source-changes > details > summary { cursor:pointer; }
+.source-changes > details > summary h2 { display:inline; }
+.source-changes > details > summary small { margin-left:.5rem; font-weight:400; font-size:.95rem; }
+.source-change-list { list-style:none; padding:0; margin:.6rem 0; display:grid; gap:.7rem; }
+.source-change-list > li { display:grid; grid-template-columns:6rem 1fr; gap:.6rem; }
+.source-change-list ul { margin:0; padding-left:1.1rem; color:var(--muted); }
+.source-change-date { font-variant-numeric:tabular-nums; color:var(--text); }
+.recent-changes { padding-left:1.4rem; }
+.recent-changes li { margin:.5rem 0; }
+.recent-changes small { margin-left:.5rem; }
+.recent-changes summary { cursor:pointer; color:var(--muted); }
+/* 术语小注（docs/features/41）：打开时词下加细虚线，关闭（读者设置或默认关）时与原文一致 */
+.term-note { all:unset; display:inline; cursor:pointer; text-decoration:underline dotted; text-decoration-color:var(--primary); text-underline-offset:.22em; }
+.term-note:focus-visible { outline:2px solid var(--primary); outline-offset:2px; border-radius:2px; }
+.term-plain { display:none; }
+html[data-reading-notes="off"] .term-note, html:not([data-reading-notes]) .term-notes-default-off .term-note { display:none; }
+html[data-reading-notes="off"] .term-plain, html:not([data-reading-notes]) .term-notes-default-off .term-plain { display:inline; }
+.term-note-pop { margin:auto; max-width:min(22rem, calc(100vw - 32px)); padding:1rem 1.1rem; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--text); box-shadow:0 8px 28px rgba(0,0,0,.18); font-size:.95rem; line-height:1.6; }
+.term-note-pop:popover-open { display:flex; flex-direction:column; gap:.35rem; }
+.term-note-facet { color:var(--muted); font-size:.85rem; }
+.term-note-close { align-self:flex-end; margin-top:.3rem; background:none; border:1px solid var(--line); border-radius:4px; padding:.15rem .6rem; color:var(--text); cursor:pointer; }
+
