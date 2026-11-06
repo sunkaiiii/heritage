@@ -175,4 +175,65 @@
     document.addEventListener("focusout", event => {
         if (event.target instanceof HTMLElement && event.target.classList.contains("mention-link")) delete event.target.dataset.cardDismissed;
     });
+    // 详情页操作栏「更多」（VR-42）：按钮开合，点菜单外或按 Esc 收起；收起只隐藏面板，朗读控制条仍在视口底部
+    const setActionMenu = (menu, open) => {
+        if (open) menu.setAttribute("data-open", ""); else menu.removeAttribute("data-open");
+        menu.querySelector("[data-action-menu-toggle]")?.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    document.addEventListener("click", event => {
+        const target = event.target instanceof Element ? event.target : null;
+        const toggle = target?.closest("[data-action-menu-toggle]");
+        for (const menu of document.querySelectorAll(".action-menu[data-open]")) {
+            if (target && target.isConnected && !menu.contains(target)) setActionMenu(menu, false);
+        }
+        const menu = toggle?.closest(".action-menu");
+        if (menu) setActionMenu(menu, !menu.hasAttribute("data-open"));
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
+        const menu = document.activeElement?.closest?.(".action-menu[data-open]");
+        if (!menu || menu.querySelector(".poster-panel,.reading-tools-panel")) return;
+        setActionMenu(menu, false);
+        menu.querySelector("[data-action-menu-toggle]")?.focus();
+    });
+    // 标签栏放不下时单行横向滚动（VR-16）：把当前项滚到可视区中间。SSR、流式渲染、增强导航和 WASM 都会换上新的标签栏，
+    // 所以观察 DOM 变化；同一个当前项只滚一次，不打断读者自己的滚动。
+    if (typeof MutationObserver === "function" && typeof requestAnimationFrame === "function" && document.documentElement) {
+        const revealed = new WeakSet();
+        let queued = false;
+        const reveal = () => {
+            queued = false;
+            for (const bar of document.querySelectorAll(".category-tabs,.view-tabs,.dimension-tabs,.years-strip,.taxonomy-tabs,.timeline-types")) {
+                const current = bar.querySelector("a.selected,a[aria-current='page']");
+                if (!current || revealed.has(current)) continue;
+                revealed.add(current);
+                if (bar.scrollWidth <= bar.clientWidth + 1) continue;
+                const box = bar.getBoundingClientRect(), item = current.getBoundingClientRect();
+                bar.scrollLeft = Math.max(0, bar.scrollLeft + item.left - box.left - (box.width - item.width) / 2);
+            }
+        };
+        const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(reveal); } };
+        new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
+        window.addEventListener("resize", () => schedule());
+        schedule();
+    }
+    // 宽表格的横向滚动提示（VR-27）：在 .table-scroll 上标出哪一侧还有没露出的列（data-more="start end"），
+    // 样式据此给右缘渐隐、给固定的首列加阴影。表格随时可能被换掉，所以同样观察 DOM 变化；滚动事件在捕获阶段统一处理。
+    if (typeof MutationObserver === "function" && typeof requestAnimationFrame === "function" && document.documentElement) {
+        const mark = box => {
+            const max = box.scrollWidth - box.clientWidth, left = Math.abs(box.scrollLeft), more = [];
+            if (max > 1) { if (left > 1) more.push("start"); if (left < max - 1) more.push("end"); }
+            const value = more.join(" ");
+            if ((box.getAttribute("data-more") ?? "") === value) return;
+            if (value) box.setAttribute("data-more", value); else box.removeAttribute("data-more");
+        };
+        let queued = false;
+        const markAll = () => { queued = false; for (const box of document.querySelectorAll(".table-scroll")) mark(box); };
+        const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(markAll); } };
+        new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
+        window.addEventListener("resize", () => schedule());
+        document.addEventListener("scroll", event => { if (event.target instanceof Element && event.target.classList.contains("table-scroll")) mark(event.target); }, true);
+        document.addEventListener("toggle", () => schedule(), true);
+        schedule();
+    }
 })();

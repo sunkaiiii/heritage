@@ -61,9 +61,12 @@
         figure.removeAttribute("data-media-missing");
         image.style.setProperty("--media-natural-width", `${image.naturalWidth}px`);
         if (image.naturalWidth < smallWidth) {
-            figure.setAttribute("data-media-small", message("small", image.naturalWidth, image.naturalHeight));
+            const note = message("small", image.naturalWidth, image.naturalHeight);
+            figure.setAttribute("data-media-small", note);
+            // 缩略图网格里说明只显示成角标（VR-96），完整说明放在悬停提示里
+            if (figure.closest(".gallery-grid,.reading-gallery-grid")) figure.title = note;
             upgrade(image, fallbacks(anchor).filter(url => url !== image.currentSrc), url => { if (image.isConnected) image.src = url; });
-        } else figure.removeAttribute("data-media-small");
+        } else { figure.removeAttribute("data-media-small"); if (figure.closest(".gallery-grid,.reading-gallery-grid")) figure.removeAttribute("title"); }
     }
     // A compressed copy can be much smaller than the recorded original; use the original only
     // when it actually loads with more pixels.

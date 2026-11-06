@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#FCF8F5" />
+    <meta name="theme-color" content="#FCF8F5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#16100E" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="E迹 Heritage Online，以文章、名录与传承人的故事，探索仍在生长的非物质文化遗产。" />
     <base href="/heritage/" />
     <title>E迹 · Heritage Online</title>
@@ -28,7 +29,11 @@
     <script src="offline.js"></script>
 </head>
 <body>
-    <div id="app"><main class="container" style="padding-block:5rem" aria-live="polite"><p>E迹 · HERITAGE ONLINE</p><h1>正在展开文化的故事</h1><p>首次打开需要加载浏览器运行组件，请稍候。</p></main></div>
+    <!-- 首次启动画面：与站点页头、站内加载态（.state-panel 与 .loading-mark）同一样式；颜色来自 app.css 的主题变量，heritage.js 已在 head 中按偏好设置深色 -->
+    <div id="app">
+        <header class="site-header"><div class="header-inner"><span class="brand"><img src="brand.svg" alt="" width="42" height="42" /><span class="brand-name">E迹<span>HERITAGE ONLINE</span></span></span></div></header>
+        <main class="site-main"><div class="container state-panel boot-panel" role="status" aria-live="polite"><span class="loading-mark"></span><h1>正在展开文化的故事</h1><p>首次打开需要加载浏览器运行组件，请稍候。</p><p lang="en">Opening the reading app for the first time. One moment, please.</p></div></main>
+    </div>
     <div id="blazor-error-ui" role="alert">页面连接遇到问题。<a href="/heritage/">重新打开</a></div>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>Blazor.start().catch(() => { document.getElementById("blazor-error-ui").style.display = "block"; });</script>
