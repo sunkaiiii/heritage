@@ -16,6 +16,8 @@
     --tile-ink-1:var(--text); --tile-ink-2:var(--text); --tile-ink-3:var(--text); --tile-ink-4:var(--text); --tile-ink-5:var(--on-primary);
     /* 图表系列色（年报堆叠柱等）：每个系列对 --surface 不低于 3:1（VR-86） */
     --series-1:var(--primary); --series-2:#b5652b; --series-3:var(--gold); --series-4:#4f6b5a; --series-5:#5a5f8a; --series-6:#8a5a7a;
+    /* 54 划线：琥珀色，与 --primary-soft（朗读段落）色相不同；文字对比 ≥ 4.5:1 */
+    --note-mark:#ffe8a3; --note-mark-strong:#ffc94d;
     --font-display:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC",Georgia,serif;
     --font-body:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
     color-scheme:light;
@@ -34,6 +36,7 @@
     --line:#5d4c45;
     --gold:#e2c47c;
     --tile-ink-1:var(--text); --tile-ink-2:var(--text); --tile-ink-3:var(--text); --tile-ink-4:var(--surface); --tile-ink-5:var(--surface);
+    --note-mark:#5c4610; --note-mark-strong:#7a5c10;
     --series-1:var(--primary); --series-2:#e59a62; --series-3:var(--gold); --series-4:#8fbf9f; --series-5:#a9aee0; --series-6:#d79ec4;
     color-scheme:dark;
 }
@@ -3417,7 +3420,7 @@ html[data-reading-contrast=high] .digest-panel,html[data-reading-contrast=high] 
     html[data-reading-size=large] .reading-body h3{font-size:21px}
     html[data-reading-size=xlarge] .reading-body h3{font-size:24px}
 }
-[data-speech-index].is-speaking{background:var(--primary-soft);color:var(--text);box-shadow:0 0 0 6px var(--primary-soft);border-radius:2px}
+[data-speech-index].is-speaking,[data-read-aloud-key].is-speaking{background:var(--primary-soft);color:var(--text);box-shadow:0 0 0 6px var(--primary-soft);border-radius:2px}
 .reading-tools-anchor{position:relative;display:inline-flex}
 .reading-tools-panel{position:absolute;top:calc(100% + 8px);right:0;z-index:20;width:min(360px,calc(100vw - 32px));padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:3px;box-shadow:0 10px 30px rgb(0 0 0 / .14);text-align:left}
 .reading-settings fieldset{border:0;padding:0;margin:0 0 14px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
@@ -3432,8 +3435,8 @@ html[data-reading-contrast=high] .digest-panel,html[data-reading-contrast=high] 
 .speech-bar button[aria-pressed=true]{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
 .speech-rates{display:inline-flex;gap:4px}
 .speech-status{width:100%;text-align:center;color:var(--muted);font-size:12px}
-@media (prefers-reduced-motion:reduce){[data-speech-index].is-speaking{transition:none}}
-@media print{[data-speech-index].is-speaking{background:none;box-shadow:none}.speech-bar,.reading-tools-panel{display:none}}
+@media (prefers-reduced-motion:reduce){[data-speech-index].is-speaking,[data-read-aloud-key].is-speaking{transition:none}}
+@media print{[data-speech-index].is-speaking,[data-read-aloud-key].is-speaking{background:none;box-shadow:none}.speech-bar,.reading-tools-panel,.continuous-reading{display:none}}
 /* 传承人世代结构（docs/features/11）：总页与嵌入块共用 */
 .generations-page .data-section{margin:3rem 0}
 .generations-page .data-section>h2{font-size:1.8rem;margin-bottom:1.2rem}
@@ -4350,16 +4353,16 @@ p,li,small,figcaption{text-wrap:pretty}
 @media(max-width:540px){.topic-tools{gap:0 1.1rem;margin:.25rem 0 1.25rem}.topic-tools a{min-height:36px;font-size:13px}}
 
 /* 行式编号列表（荣誉、工序、观察、少有人讲、地方页）：行间分隔线，名称是衬线链接色，编号收进版心以内（VR-60、VR-64） */
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list{list-style:none;padding:0;margin:0 0 1.5rem;counter-reset:row;border-bottom:1px solid var(--line)}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list>li{position:relative;margin:0;padding:12px 0;border-top:1px solid var(--line)}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) ol.quiet-list>li{padding-left:2.6rem;counter-increment:row}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) ol.quiet-list>li::before{content:counter(row);position:absolute;left:0;top:14px;width:2rem;text-align:right;font:400 13px/1.6 var(--font-body);color:var(--muted);font-variant-numeric:tabular-nums}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list>li>a:first-child{font:500 1.05rem/1.6 var(--font-display);color:var(--primary);text-decoration:none}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list>li>a:first-child strong{font-weight:500}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list>li>a:first-child:hover{text-decoration:underline;text-underline-offset:4px}
-:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list small.related-meta{font-size:12px;color:var(--muted)}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list{list-style:none;padding:0;margin:0 0 1.5rem;counter-reset:row;border-bottom:1px solid var(--line)}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list>li{position:relative;margin:0;padding:12px 0;border-top:1px solid var(--line)}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) ol.quiet-list>li{padding-left:2.6rem;counter-increment:row}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) ol.quiet-list>li::before{content:counter(row);position:absolute;left:0;top:14px;width:2rem;text-align:right;font:400 13px/1.6 var(--font-body);color:var(--muted);font-variant-numeric:tabular-nums}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list>li>a:first-child{font:500 1.05rem/1.6 var(--font-display);color:var(--primary);text-decoration:none}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list>li>a:first-child strong{font-weight:500}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list>li>a:first-child:hover{text-decoration:underline;text-underline-offset:4px}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list small.related-meta{font-size:12px;color:var(--muted)}
 /* 列表计数紧跟筛选条时与名录列表同样留白；分页后的口径说明不贴着分页 */
-:is(.honor-page,.process-page,.watch-page,.quiet-page) .filter-bar+.content-note{margin-top:24px}
+:is(.honor-page,.process-page,.watch-page,.quiet-page,.origin-page) .filter-bar+.content-note{margin-top:24px}
 :is(.honor-page,.process-page,.watch-page,.quiet-page,.materials-page) :is(.pagination,.quiet-list,.facet-cards)+details.data-section{margin-top:40px}
 .quiet-page .tile-count-map+.filter-bar,.quiet-page .data-section+.filter-bar{margin-top:32px}
 /* 观察标签与名录已选条件同为圆角胶囊 */
@@ -4372,7 +4375,7 @@ p,li,small,figcaption{text-wrap:pretty}
 .honor-page .honor-groups{border-bottom:0}
 .honor-back{margin:0 0 12px}
 .honor-back .text-link{gap:6px}
-@media(max-width:540px){:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) .quiet-list>li>small.related-meta{display:block;margin:2px 0 0}:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) ol.quiet-list>li{padding-left:2rem}:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page) ol.quiet-list>li::before{width:1.5rem}}
+@media(max-width:540px){:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) .quiet-list>li>small.related-meta{display:block;margin:2px 0 0}:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) ol.quiet-list>li{padding-left:2rem}:is(.honor-page,.process-page,.watch-page,.quiet-page,.place-page,.origin-page,.spread-page,.apprentice-page,.repertoire-page) ol.quiet-list>li::before{width:1.5rem}}
 
 /* 传承人页「荣誉与称号」与「年表」「时间线」同一种折叠标题：三角、标题、计数同一行（VR-107） */
 .related-reading>details>summary{cursor:pointer}
@@ -4522,3 +4525,101 @@ p,li,small,figcaption{text-wrap:pretty}
     a { color:inherit; }
     .inline-link { color:var(--primary); }
 }
+
+/* 从哪个朝代开始（docs/features/52 §3.2）：9 段等宽朝代带，手机宽度折成 3×3；选中段用文字粗细与边框标出，不只靠颜色 */
+.origin-eras{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;margin:.5rem 0 1rem}
+.origin-eras a{display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:10px 4px;border:1px solid var(--line);border-radius:6px;color:var(--text);text-decoration:none;text-align:center;min-width:0}
+.origin-eras a span{font-size:13px;line-height:1.3;overflow-wrap:anywhere}
+.origin-eras a strong{font:500 1.15rem/1.2 var(--font-display);color:var(--primary);font-variant-numeric:tabular-nums}
+.origin-eras a.selected{border-color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary);font-weight:600}
+.origin-eras a:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.origin-page .origin-writing{margin:.25rem 0}
+.origin-page .origin-hedged{display:inline-block;margin-right:.4rem;padding:0 6px;border:1px solid var(--line);border-radius:4px;font-size:12px;color:var(--muted)}
+@media (max-width:720px){.origin-eras{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.quoted-fact{display:inline}
+.fact-more summary{cursor:pointer;color:var(--primary)}
+
+/* 流传范围（docs/features/51 §3.3）：页头两个数字、「同一句」分组 */
+.spread-totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:1rem 0}
+.spread-totals a{display:flex;flex-direction:column;gap:.2rem;padding:12px 14px;border:1px solid var(--line);border-radius:6px;color:var(--text);text-decoration:none}
+.spread-totals strong{font:500 1.4rem/1.2 var(--font-display);color:var(--primary)}
+.spread-page .spread-group{background:var(--surface-muted,transparent)}
+.spread-page .spread-member{padding-left:1rem}
+.spread-region-line{margin:.5rem 0 1rem}
+
+/* 带徒与授艺（docs/features/53）：列表行的「带徒／培养学生」用文字标出，不只靠颜色 */
+.apprentice-page .apprentice-writing{margin:.25rem 0}
+.apprentice-page .apprentice-kind{display:inline-block;margin-right:.4rem;padding:0 6px;border:1px solid var(--line);border-radius:4px;font-size:12px;color:var(--muted)}
+.family-apprentices{margin:.5rem 0 1rem}
+.watch-apprentices{margin:.25rem 0 0}
+
+/* 剧目与作品（docs/features/50）：字母栏沿用名录词典的样式，选中字母用边框与粗细标出 */
+.repertoire-letters a.selected{border-color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary);font-weight:600}
+.repertoire-letters a small{margin-left:.2rem;font-size:11px;color:var(--muted)}
+.repertoire-letters span.disabled{display:inline-flex;align-items:center;justify-content:center;min-height:44px;color:var(--muted);opacity:.5}
+.repertoire-page .repertoire-family{font-size:1rem;margin:1rem 0 .3rem}
+.repertoire-page .repertoire-multi{padding:10px 12px;border-left:3px solid var(--primary);background:transparent}
+
+/* 54 我的划线与笔记（docs/features/54 §4.5）：划线由 CSS Custom Highlight API 画，叠在朗读段落与 :target 的整段底色之上，在 ::target-text 与选区之下 */
+::highlight(heritage-note){background-color:var(--note-mark);color:var(--text)}
+::highlight(heritage-note-active){background-color:var(--note-mark-strong);color:var(--text)}
+html[data-reading-contrast=high]{--note-mark:#ffd166;--note-mark-strong:#f2a900}
+html[data-theme=dark][data-reading-contrast=high]{--note-mark:#7a5c10;--note-mark-strong:#9c7414}
+html[data-reading-contrast=high] ::highlight(heritage-note),html[data-reading-contrast=high] ::highlight(heritage-note-active){text-decoration:underline 2px solid currentColor;text-underline-offset:3px}
+/* 不支持 Highlight API 时：段落左侧细竖线标出「这段有划线」 */
+.reading-body p.content-paragraph[data-note-count]{box-shadow:inset 3px 0 0 var(--note-mark-strong);padding-left:10px}
+html[data-reading-contrast=high] .reading-body p.content-paragraph[data-note-count]{box-shadow:inset 4px 0 0 var(--text)}
+@media (forced-colors:active){
+    ::highlight(heritage-note){background-color:Mark;color:MarkText}
+    ::highlight(heritage-note-active){background-color:Highlight;color:HighlightText}
+    .reading-body p.content-paragraph[data-note-count]{box-shadow:none;border-left:3px solid Mark}
+    .note-toolbar,.note-card,.note-dialog{border:1px solid CanvasText}
+}
+.page-notes{margin:2rem 0 1rem}
+.page-notes-panel{border-top:1px solid var(--line);padding-top:.75rem}
+.page-notes-panel>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:600}
+.page-notes-list{list-style:none;margin:.5rem 0 0;padding:0;display:grid;gap:.75rem}
+.page-notes-list li{padding:.6rem .75rem;border-left:3px solid var(--note-mark-strong);background:var(--surface-low)}
+.page-notes-list li.is-missing{border-left-color:var(--line)}
+.page-notes-list blockquote,.note-card blockquote,.note-dialog blockquote{margin:0;font-family:var(--font-display);line-height:1.7;overflow-wrap:anywhere}
+.page-note-text{margin:.3rem 0 0;color:var(--text);overflow-wrap:anywhere}
+.page-note-meta{margin:.25rem 0 0;font-size:13px;color:var(--muted)}
+.page-note-actions{display:flex;flex-wrap:wrap;gap:0 1rem}
+.page-note-actions .text-link,.page-note-actions a{min-height:44px;display:inline-flex;align-items:center}
+.page-notes-corrupt{display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center}
+.note-toolbar{position:fixed;z-index:40;display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--paper);border:1px solid var(--line);border-radius:4px;box-shadow:0 10px 30px rgb(0 0 0 / .18);font-size:13px}
+.note-toolbar .button,.note-toolbar .icon-button{min-width:44px;min-height:44px}
+.note-toolbar.is-docked{left:16px;right:16px;bottom:16px;justify-content:center}
+.note-toolbar-reason{padding:0 6px;color:var(--text)}
+.note-card{max-width:min(420px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;padding:16px;background:var(--paper);color:var(--text);border:1px solid var(--line);border-radius:4px;box-shadow:0 16px 40px rgb(0 0 0 / .22)}
+.note-card-item+.note-card-item{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--line)}
+.note-dialog{width:min(520px,calc(100vw - 32px));padding:20px;background:var(--paper);color:var(--text);border:1px solid var(--line);border-radius:4px}
+.note-dialog::backdrop{background:rgb(0 0 0 / .4)}
+.note-dialog h2{margin:0 0 .75rem;font-size:1.1rem}
+.note-dialog label{display:block;margin-top:.75rem;font-weight:600}
+.note-dialog textarea,.note-dialog select{width:100%;margin-top:.3rem;padding:8px;font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:3px}
+.note-dialog .confirm-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:1rem}
+.note-dialog blockquote{padding:.5rem .75rem;border-left:3px solid var(--note-mark-strong);background:var(--surface-low)}
+.note-dialog-count{margin:.25rem 0 0;font-size:13px;color:var(--muted);text-align:right}
+.note-sentences{margin:.75rem 0 0;padding:0;border:0;max-height:45vh;overflow:auto}
+.note-sentences legend{font-weight:600}
+.note-sentences label{display:flex;gap:.5rem;align-items:flex-start;margin:0;padding:.4rem 0;font-weight:400;line-height:1.6;min-height:44px}
+.note-sentences label.is-disabled{color:var(--muted)}
+.note-board-menu{position:static;min-width:0;margin-top:.5rem}
+.notes-workspace .notes-group .page-notes-list{grid-column:1/-1}
+.notes-check{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.notes-check small{color:var(--muted)}
+@media print{.page-notes,.note-toolbar,.note-card,.note-dialog{display:none!important}.reading-body p.content-paragraph[data-note-count]{box-shadow:none;padding-left:0}}
+
+/* 56 连续朗读（docs/features/56 §3）：入口一行、朗读条小字；行高亮与 16 号段落高亮共用上面的规则 */
+.continuous-reading{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin:.5rem 0 1rem}
+.continuous-reading .button{min-height:44px}
+.continuous-reading-resume{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .75rem}
+.continuous-reading-resume .text-link{min-height:44px;display:inline-flex;align-items:center}
+/* 窄屏上朗读条左右各留 16px 铺开（left:50% 加平移时可用宽度只有半屏，按钮会挤成一列）；16 号与 56 号共用 */
+@media (max-width:540px){.speech-bar{left:16px;right:16px;transform:none;max-width:none}}
+.speech-bar .speech-detail{flex-basis:100%;text-align:center;font-size:12px;color:var(--muted)}
+.speech-bar .speech-detail a{color:inherit}
+html[data-reading-contrast=high] [data-read-aloud-key].is-speaking{outline:2px solid var(--text);outline-offset:2px}
+@media (forced-colors:active){[data-read-aloud-key].is-speaking,[data-speech-index].is-speaking{outline:2px solid Highlight;outline-offset:2px}}
+
