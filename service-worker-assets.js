@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "zPes3VpQ",
+  "version": "Ov2cJqO4",
   "assets": [
     {
       "hash": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
@@ -22,16 +22,16 @@ self.assetsManifest = {
       "url": "_content/Heritage.Web.UI/Heritage.Web.UI.ko6zveo6gv.bundle.scp.css"
     },
     {
-      "hash": "sha256-s+/PfRmlYvrdAhNVZ5o5R1cLgMwQaaZCsIe6xRhTtAo=",
-      "url": "_framework/Heritage.Contracts.p5owyjkgmw.wasm"
+      "hash": "sha256-Uu3dmIl6TDLSzJfV1d96PGuOPTtQ2I4p8tIRwt/xuSk=",
+      "url": "_framework/Heritage.Contracts.atdr09tgyl.wasm"
     },
     {
-      "hash": "sha256-+D/Aqy3Lsth7qQ5XM3KAas16qV7Q167KCVIE0s3Vwsk=",
-      "url": "_framework/Heritage.Web.Client.kxozbnrarq.wasm"
+      "hash": "sha256-afofphWcVRXfwtl4yyuAlhMeAjoiHsd70ybfK35lNE0=",
+      "url": "_framework/Heritage.Web.Client.zx1nod7b0e.wasm"
     },
     {
-      "hash": "sha256-AjNPvKuBHZwLU9bBPqmNTynYSMKup3jPNPcZ3rL5vx4=",
-      "url": "_framework/Heritage.Web.UI.6fax8irtb3.wasm"
+      "hash": "sha256-aUJFkYTK8S084XRheRR1TcufBE892v5zs0oXBYlu85A=",
+      "url": "_framework/Heritage.Web.UI.9c7xn697pv.wasm"
     },
     {
       "hash": "sha256-J9S9btiLVbGJviMNrnMRVrsDpD6DoxjAspcocjo8xAk=",
@@ -162,8 +162,8 @@ self.assetsManifest = {
       "url": "_framework/System.IO.Pipelines.unqpbva9an.wasm"
     },
     {
-      "hash": "sha256-P6zTSFFFA9E3UJ0y9ARGnfUQ7FjV16D/OGnqjkvRD5I=",
-      "url": "_framework/System.Linq.blw9jfxksr.wasm"
+      "hash": "sha256-CwOaxwc4HaGZnU923QQxVCskmc6JbzsC2AWHlyQIbIE=",
+      "url": "_framework/System.Linq.t2xmcszs6t.wasm"
     },
     {
       "hash": "sha256-xnPx9E288wsYjVGJwWkP0WhqKGxxcoRE1V2pjw60CX0=",
@@ -234,7 +234,7 @@ self.assetsManifest = {
       "url": "_framework/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-QDhHmRN4cRw1A0pO90OiVxMX5y5Tsw3fgEALxHPVYfk=",
+      "hash": "sha256-l60LKvBbo1MuMKIlP+jpAopd1fWPETjWJiEnow01wck=",
       "url": "_framework/dotnet.js"
     },
     {
@@ -310,7 +310,7 @@ self.assetsManifest = {
       "url": "media-viewer.js"
     },
     {
-      "hash": "sha256-oZmMD8llwh4Ra4TcUNhIITNmNPTJynVvqd5YSLyEk9g=",
+      "hash": "sha256-X4z6UlLNmHvU9VDA7hYNylf0Nj1JNz/S9kH+eYZNNhc=",
       "url": "notes.js"
     },
     {

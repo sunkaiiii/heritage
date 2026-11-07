@@ -473,7 +473,16 @@
         hidePopover(id) { try { document.getElementById(id)?.hidePopover(); } catch { /* 已关闭 */ } },
         showDialog(id) { const d = document.getElementById(id); if (d && !d.open) d.showModal(); },
         closeDialog(id) { document.getElementById(id)?.close(); },
-        focus(selector) { document.querySelector(selector)?.focus(); }
+        focus(selector) { document.querySelector(selector)?.focus(); },
+        // 笔记框关闭后回到本页一栏里的这一条：一栏收起时先展开
+        focusItem(id) {
+            const item = document.getElementById(id);
+            if (!item) return false;
+            const panel = item.closest("details");
+            if (panel) panel.open = true;
+            item.focus();
+            return true;
+        }
     });
     window.heritageNotes = api;
 
